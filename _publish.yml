@@ -1,0 +1,4 @@
+- source: project
+  quarto-pub:
+    - id: 445fc0dd-1fec-406b-85c0-bcb93c2d06ae
+      url: 'https://tolo.quarto.pub/jaekangai-quarto'

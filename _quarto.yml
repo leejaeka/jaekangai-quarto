@@ -14,6 +14,8 @@ format:
   html:
     theme: cosmo
     css: styles.css
-
+listing:
+  contents: posts
+  sort: "date"
 
 

@@ -1,0 +1,59 @@
+{
+  "about.qmd": {
+    "about.html": "80991e1e"
+  },
+  "index.qmd": {
+    "index.html": "d61a0521"
+  },
+  "posts/2020-10-27-city.ipynb": {
+    "2020-10-27-city.html": "2a779f8c"
+  },
+  "posts/2020-10-27-croc.ipynb": {
+    "2020-10-27-croc.html": "e7d2b276"
+  },
+  "posts/2020-10-28-lolpredict.ipynb": {
+    "2020-10-28-lolpredict.html": "2b5e829f"
+  },
+  "posts/2020-11-27-So-I-learned-some-new-algorithms.ipynb": {
+    "2020-11-27-So-I-learned-some-new-algorithms.html": "4f14c15f"
+  },
+  "posts/2020-12-02-Deep-Art-Gallery.ipynb": {
+    "2020-12-02-Deep-Art-Gallery.html": "d67ed459"
+  },
+  "posts/2020-12-30-certificates.ipynb": {
+    "2020-12-30-certificates.html": "ed8d8367"
+  },
+  "posts/2020-12-30-lolpredictb.ipynb": {
+    "2020-12-30-lolpredictb.html": "3cd12fe4"
+  },
+  "posts/2021-01-05-bike.ipynb": {
+    "2021-01-05-bike.html": "71be0576"
+  },
+  "posts/2021-01-15-Recommendations.ipynb": {
+    "2021-01-15-Recommendations.html": "66dcfda7"
+  },
+  "posts/2021-01-23-JaneStreet-Copy1.ipynb": {
+    "2021-01-23-JaneStreet-Copy1.html": "cf2f1a12"
+  },
+  "posts/2021-01-25-jane-predict.ipynb": {
+    "2021-01-25-jane-predict.html": "d812eba8"
+  },
+  "posts/2021-04-04-Short-Storytime.ipynb": {
+    "2021-04-04-Short-Storytime.html": "a363c036"
+  },
+  "posts/2021-04-23-FairnessReport.ipynb": {
+    "2021-04-23-FairnessReport.html": "98fc2e02"
+  },
+  "posts/2021-05-02-nmu.ipynb": {
+    "2021-05-02-nmu.html": "12980215"
+  },
+  "posts/2024-06-30-gaslight.ipynb": {
+    "2024-06-30-gaslight.html": "fda6cfd3"
+  },
+  "posts/post-with-code/index.qmd": {
+    "index.html": "f1ed0a00"
+  },
+  "posts/welcome/index.qmd": {
+    "index.html": "d964f867"
+  }
+}
