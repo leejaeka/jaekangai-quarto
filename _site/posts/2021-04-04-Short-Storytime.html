@@ -314,7 +314,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   }
     var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
     var mailtoRegex = new RegExp(/^mailto:/);
-      var filterRegex = new RegExp("https:\/\/445fc0dd-1fec-406b-85c0-bcb93c2d06ae\.netlify\.app\/");
+      var filterRegex = new RegExp("https:\/\/jaekang\.quarto\.pub\/jaekangai-quarto");
     var isInternal = (href) => {
         return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
     }

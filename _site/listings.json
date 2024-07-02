@@ -2,13 +2,7 @@
   {
     "listing": "/index.html",
     "items": [
-      "/posts/2020-10-27-city.html",
-      "/posts/2020-10-27-croc.html",
-      "/posts/2020-10-28-lolpredict.html",
-      "/posts/2020-11-27-So-I-learned-some-new-algorithms.html",
-      "/posts/2020-12-02-Deep-Art-Gallery.html",
       "/posts/2020-12-30-certificates.html",
-      "/posts/2020-12-30-lolpredictb.html",
       "/posts/2021-01-05-bike.html",
       "/posts/2021-01-15-Recommendations.html",
       "/posts/2021-01-23-JaneStreet-Copy1.html",
@@ -18,7 +12,13 @@
       "/posts/2021-05-02-nmu.html",
       "/posts/2024-06-30-gaslight.html",
       "/posts/post-with-code/index.html",
-      "/posts/welcome/index.html"
+      "/posts/welcome/index.html",
+      "/posts/2020-12-30-lolpredictb.html",
+      "/posts/2020-12-02-Deep-Art-Gallery.html",
+      "/posts/2020-11-27-So-I-learned-some-new-algorithms.html",
+      "/posts/2020-10-28-lolpredict.html",
+      "/posts/2020-10-27-city.html",
+      "/posts/2020-10-27-croc.html"
     ]
   }
 ]
