@@ -6,6 +6,8 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
+<meta name="author" content="Jaekang Lee">
+<meta name="dcterms.date" content="2021-01-23">
 
 <title>Jane Street Market EDA 📈 – jaekangai-quarto</title>
 <style>
@@ -180,13 +182,33 @@ window.Quarto = {
   <div class="quarto-title-banner page-columns page-full">
     <div class="quarto-title column-body">
       <h1 class="title">Jane Street Market EDA 📈</h1>
-                      </div>
+                                <div class="quarto-categories">
+                <div class="quarto-category">EDA</div>
+                <div class="quarto-category">Jane Street</div>
+                <div class="quarto-category">Kaggle</div>
+                <div class="quarto-category">Visualization</div>
+                <div class="quarto-category">Big Data</div>
+                <div class="quarto-category">ETL</div>
+              </div>
+                  </div>
   </div>
     
   
   <div class="quarto-title-meta">
 
+      <div>
+      <div class="quarto-title-meta-heading">Author</div>
+      <div class="quarto-title-meta-contents">
+               <p>Jaekang Lee </p>
+            </div>
+    </div>
       
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">January 23, 2021</p>
+      </div>
+    </div>
     
       
     </div>
@@ -203,16 +225,11 @@ window.Quarto = {
 
 
 
+<section id="jane-street-market-eda" class="level1">
+<h1>Jane Street Market EDA 📈</h1>
 <blockquote class="blockquote">
 <p>Jane Street Market Prediction Kaggle Competition</p>
 </blockquote>
-<ul>
-<li>toc: true</li>
-<li>badges: true</li>
-<li>comments: true</li>
-<li>author: Jaekang Lee</li>
-<li>categories: [python, EDA, Jane Street, Kaggle, Visualization, Big Data]</li>
-</ul>
 <div id="cell-2" class="cell" data-execution_count="21">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co">#hide_input</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>Image(filename <span class="op">=</span> <span class="st">"images/jane_logo.png"</span>, width <span class="op">=</span><span class="dv">800</span>, height <span class="op">=</span> <span class="dv">300</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -1105,6 +1122,7 @@ Name: feature_0, dtype: int64</code></pre>
 <p>In another <a href="https://leejaeka.github.io/jaekangai/mlp/python/feature%20engineering/imputation/jane%20street/kaggle/visualization/big%20data/random%20forest/2021/01/25/jane-predict.html">notebook</a>. ### Implementation Planning Thoughts going into predicting phase. 1. Days before ~100 can be dropped as suspicion of model shift. 2. Feature_0 seem very important to find slope of cummulative resp. 3. Resp near 0 is prefered over other values. 4. A lot of features are normally distributed. 5. We have over 2 million datas, it would be safe to add lot more features(feature enginerring) 6. There are a lot of missing values too. Can try mean, median or KNN imputation methods. 7. Note that although this is kind of a time series data, we can only predict with features 0 to 129</p>
 
 
+</section>
 </section>
 </section>
 
