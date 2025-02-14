@@ -1,0 +1,1225 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.5.52">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Jaekang Lee">
+<meta name="dcterms.date" content="2024-07-02">
+
+<title>CV generator using LangGraph agentic workflow (team of AI’s) 🤖 – jaekangai-quarto</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-dark.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-dark.min.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+
+<link rel="stylesheet" href="../../styles.css">
+</head>
+
+<body class="nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top quarto-banner">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">jaekangai-quarto</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../about.html"> 
+<span class="menu-text">About</span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/"> <i class="bi bi-github" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://twitter.com"> <i class="bi bi-twitter" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title">CV generator using LangGraph agentic workflow (team of AI’s) 🤖</h1>
+                                <div class="quarto-categories">
+                <div class="quarto-category">ml</div>
+                <div class="quarto-category">side-quest</div>
+              </div>
+                  </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      <div>
+      <div class="quarto-title-meta-heading">Author</div>
+      <div class="quarto-title-meta-contents">
+               <p>Jaekang Lee </p>
+            </div>
+    </div>
+      
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">July 2, 2024</p>
+      </div>
+    </div>
+    
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#try-it-out-yourself-webapp-built-with-render" id="toc-try-it-out-yourself-webapp-built-with-render" class="nav-link active" data-scroll-target="#try-it-out-yourself-webapp-built-with-render">0. Try it out yourself! Webapp built with Render</a></li>
+  <li><a href="#introduction" id="toc-introduction" class="nav-link" data-scroll-target="#introduction">1. Introduction</a></li>
+  <li><a href="#code" id="toc-code" class="nav-link" data-scroll-target="#code">2. Code</a></li>
+  <li><a href="#result---agents-outputs-in-detail" id="toc-result---agents-outputs-in-detail" class="nav-link" data-scroll-target="#result---agents-outputs-in-detail">3. Result - agents’ outputs in detail</a>
+  <ul class="collapse">
+  <li><a href="#planner-agent" id="toc-planner-agent" class="nav-link" data-scroll-target="#planner-agent">3.1 Planner agent</a></li>
+  <li><a href="#research-planner-agent" id="toc-research-planner-agent" class="nav-link" data-scroll-target="#research-planner-agent">3.2 Research Planner agent</a></li>
+  <li><a href="#writer-agent" id="toc-writer-agent" class="nav-link" data-scroll-target="#writer-agent">3.3 Writer agent</a></li>
+  <li><a href="#reflection-agent" id="toc-reflection-agent" class="nav-link" data-scroll-target="#reflection-agent">3.4 Reflection agent</a></li>
+  <li><a href="#research-planner-agent-loop" id="toc-research-planner-agent-loop" class="nav-link" data-scroll-target="#research-planner-agent-loop">3.5 Research Planner agent loop</a></li>
+  <li><a href="#writer-agent-loop" id="toc-writer-agent-loop" class="nav-link" data-scroll-target="#writer-agent-loop">3.6 Writer agent loop</a></li>
+  </ul></li>
+  <li><a href="#conclusion" id="toc-conclusion" class="nav-link" data-scroll-target="#conclusion">4. Conclusion</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+
+
+
+
+<section id="try-it-out-yourself-webapp-built-with-render" class="level2">
+<h2 class="anchored" data-anchor-id="try-it-out-yourself-webapp-built-with-render">0. Try it out yourself! Webapp built with Render</h2>
+<p>note: may take 50 second to load as it is free tier.</p>
+<p><a href="https://cover-letter-generator-langgraph-agentic.onrender.com/">Cover Letter Generator - Tavily Web Search + GPT4 Agentic Workflow</a> <img src="2024-07-02-cvgen_files/figure-html/5c8fe80e-1-cv_gen_1.png" class="img-fluid" alt="cv_gen_1.png"></p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="2024-07-02-cvgen_files/figure-html/3e70a9f2-1-cv_gen2.png" class="img-fluid figure-img"></p>
+<figcaption>cv_gen2.png</figcaption>
+</figure>
+</div>
+</section>
+<section id="introduction" class="level2">
+<h2 class="anchored" data-anchor-id="introduction">1. Introduction</h2>
+<p>Introducing the AI-Powered Cover Letter Generator! This innovative project uses GPT-4 and Langgraph agents to create standout cover letters. With five specialized agents working together, it not only crafts compelling content but also <strong>conducts real-time online research using Tavily search API</strong> to incorporate the latest relevant information. Whether you’re a seasoned pro or just starting out, this tool helps you create a tailored, up-to-date cover letter that boosts your chances of landing that crucial interview.</p>
+<p>Agentic workflow employs an <strong>inquiry-based approach, posing targeted questions to scour the web for pertinent information</strong>. For instance, it seeks answers to questions such as ‘What is the company’s history?’, ‘What are the key responsibilities of the applicant’s position within the company?’, and ‘What are the company’s core values?’ By automating this research process, agentic workflow streamlines the task of gathering essential details. As demonstrated in the example below, this technology successfully uncovered Snap Inc.’s adherence to a ‘Default Together’ policy, enabling the applicant to <strong>tailor their cover letter with insight that simulates thorough research</strong>.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 36%">
+<col style="width: 63%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Prompt engineering (via Meta.ai llama 3.1)</th>
+<th>Agentic workflow with web search (via gpt-4 agents)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Dear Hiring Manager,<br>I’m excited to apply for the Data Scientist position at Snap Inc., where I can leverage my expertise in quantitative analysis, data mining, and statistical modeling to drive informed business and product decisions. With a strong background in mathematics, computer science, and statistics, I’m confident in my ability to deliver impactful data insights that enable product innovation and growth.<br>As a seasoned data scientist with experience in managing projects and collaborating with cross-functional teams, I’m well-equipped to work in a highly collaborative environment and drive projects to completion with minimal guidance. My experience in AI lead roles has taught me the importance of effective communication, and I’m skilled at distilling complex technical concepts into actionable insights for stakeholders.<br>My technical skills align with the requirements, including expertise in data modeling, SQL, programming languages (Python), and applied statistical techniques. I’m also familiar with machine learning and statistical analysis for building data-driven product solutions. My experience with MLOps, LLM, Langchain, and RAG systems will enable me to make a meaningful contribution to Snap’s product development.<br>I’m particularly drawn to Snap’s commitment to empowering people to express themselves, live in the moment, and have fun together. As a data scientist, I believe that data-driven insights can help unlock new product opportunities and improve user experiences. I’m excited about the prospect of joining a team that shares my passion for innovation and collaboration.<br>Thank you for considering my application. I’m looking forward to discussing my qualifications further.<br>Sincerely,<br>Jaekang Lee</td>
+<td>Jaekang Lee<br>Vancouver, BC, Canada<br>Phone: 778-929-6940<br>Email: tonylee015@gmail.com<br>July 22, 2024<br><br>Hiring Manager<br>Snap Inc.<br><br>Dear Hiring Manager,<br><br>I am writing to express my interest in the Data Scientist position at Snap Inc., as advertised. With a robust background in data science and artificial intelligence, particularly in the realm of quantitative analysis, data mining, and statistical modeling, I am excited about the opportunity to contribute to Snap’s mission of improving the way people live and communicate through innovative products.<br><br>As the AI Lead for the Canadian Food Inspection Agency, I spearheaded the Finesse project, revolutionizing internal document search capabilities through semantic search and embedded vector stores, achieving a 130% increase in result accuracy. My leadership in the Louis project resulted in a 132% boost in model output quality for a ChatGPT-like virtual assistant, demonstrating my ability to overcome complex AI challenges. These experiences have honed my expertise in delivering impactful, data-driven insights that align perfectly with the responsibilities outlined for the role at Snap Inc.<br><br>My academic foundation from the University of Toronto, complemented by a Data Scientist Nanodegree from Udacity, has equipped me with a deep understanding of mathematics, computer science, and statistics. This education, paired with my hands-on experience in managing projects and collaborating with cross-functional teams, positions me to effectively drive informed business and product decisions at Snap.<br><br>In my current role, I have successfully managed projects with a focus on scalability, working closely with frontend, backend, and DevOps interns. My collaborative approach, utilizing tools like GitHub and weekly Teams meetings, ensures seamless communication and project delivery. My technical proficiency spans a wide array of tools and languages, including Python, Git, Docker, and machine learning frameworks, which I have applied in various projects and Kaggle competitions.<br><br>My passion for data science extends beyond my professional work. I maintain a personal machine learning and data science blog and am currently developing innovative projects, such as a two-player game that challenges AI in unique ways and a cover letter generator using advanced AI techniques. These initiatives reflect my creativity and dedication to the field.<br><br>I am particularly drawn to <strong>Snap Inc.’s “Default Together” policy</strong>, as I firmly believe in the power of collaboration and in-person interaction to foster a vibrant and effective work environment. I am eager to bring my analytical skills, product sense, and innovative mindset to the Product team at Snap, contributing to the special ways we bring our community together.<br><br>Thank you for considering my application. I am looking forward to the opportunity to discuss how my background, skills, and enthusiasms can be aligned with the dynamic work at Snap Inc.&nbsp;Please find my resume attached for your review.<br><br>Sincerely,<br>Jaekang Lee</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="code" class="level2">
+<h2 class="anchored" data-anchor-id="code">2. Code</h2>
+<p>We connect the output of an agent’s output as an input to another agent in the flow. In case of reflection loop, we set a maximum revision number equal to two times in this example.</p>
+<p>You can find the full notebook <a href="https://github.com/leejaeka/cover_letter_generator_langgraph_agentic_workflow/blob/main/cv_gen_tavily_langgraph1.ipynb">here</a>. Run code on Colab.</p>
+<p><strong>Requirements</strong> 1. <a href="https://app.tavily.com/home">Tavily search API key</a> 2. One of OpenAI API key, AzureOpenAI API key, or Anthropic API key</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="2024-07-02-cvgen_files/figure-html/d5da21c7-1-graph.png" class="img-fluid figure-img"></p>
+<figcaption>graph.png</figcaption>
+</figure>
+</div>
+<center>
+image src: deeplearning.ai
+</center>
+</section>
+<section id="result---agents-outputs-in-detail" class="level2">
+<h2 class="anchored" data-anchor-id="result---agents-outputs-in-detail">3. Result - agents’ outputs in detail</h2>
+<p>Let us analyse each agent’s contribution, one by one</p>
+<section id="planner-agent" class="level3">
+<h3 class="anchored" data-anchor-id="planner-agent">3.1 Planner agent</h3>
+<img src="image/planner1.jpeg" style="width:200px;height:200px;">
+<center>
+</center>
+<section id="planner-agent-creation-prompt" class="level4">
+<h4 class="anchored" data-anchor-id="planner-agent-creation-prompt">3.1.1 Planner agent creation prompt</h4>
+<details>
+<summary>
+<h5 style="display:inline-block" class="anchored">
+▶ See prompt
+</h5>
+</summary>
+<pre><code>    
+    "You are an expert writer tasked with writing a high level outline of a cover letter. Write such an outline for the given applicant to given job description. Give an outline of the cover letter along with any relevant notes or instructions for the sections."
+    </code></pre>
+</details>
+</section>
+<section id="planner-agents-raw-output" class="level4">
+<h4 class="anchored" data-anchor-id="planner-agents-raw-output">3.1.2 Planner agent’s raw output</h4>
+<details>
+<summary>
+<h5 style="display:inline-block" class="anchored">
+▶ See output
+</h5>
+</summary>
+<ol type="1">
+<li>Header</li>
+</ol>
+<ul>
+<li>Applicant’s Contact Information
+<ul>
+<li>Name: Jaekang Lee</li>
+<li>Address: Vancouver, BC, Canada</li>
+<li>Phone Number: 778-929-6940</li>
+<li>Email Address: tonylee015@gmail.com</li>
+</ul></li>
+<li>Date of Application</li>
+<li>Employer’s Contact Information
+<ul>
+<li>Company Name: SoundHound AI</li>
+<li>[Include if available: Hiring Manager’s Name, Company Address]</li>
+</ul></li>
+</ul>
+<ol start="2" type="1">
+<li>Salutation</li>
+</ol>
+<ul>
+<li>Dear [Hiring Manager’s Name or “SoundHound AI Hiring Team” if name is not known],</li>
+</ul>
+<ol start="3" type="1">
+<li>Introduction</li>
+</ol>
+<ul>
+<li>Briefly introduce yourself and state the position you are applying for.</li>
+<li>Mention how you learned about the job opening.</li>
+<li>Express your enthusiasm for the role and the company.</li>
+</ul>
+<ol start="4" type="1">
+<li>Body Paragraph 1: Relevant Experience and Accomplishments</li>
+</ol>
+<ul>
+<li>Highlight your role as an AI Lead and your accomplishments in AI projects, emphasizing those related to NLP and machine learning, which are relevant to ASR technologies.</li>
+<li>Discuss the Finesse and Louis projects, showcasing your experience with large language models and semantic search technologies.</li>
+<li>Mention your success in building advanced NLP models for secure processing of sensitive documents and image classifiers for agricultural compliance.</li>
+</ul>
+<ol start="5" type="1">
+<li>Body Paragraph 2: Educational Background and Technical Skills</li>
+</ol>
+<ul>
+<li>Outline your educational qualifications from the University of Toronto and Udacity, focusing on relevant coursework and projects.</li>
+<li>Detail your technical skills that align with the job requirements, such as proficiency in Python, deep learning frameworks, and experience with ASR or NLP.</li>
+</ul>
+<ol start="6" type="1">
+<li>Body Paragraph 3: Alignment with Job Requirements</li>
+</ol>
+<ul>
+<li>Draw parallels between the job description and your experience, particularly your work with machine learning, deep learning techniques, and voice AI applications.</li>
+<li>Mention any experience with Kaldi, PyTorch, TensorFlow, and on-device models, if applicable.</li>
+<li>Highlight your ability to write production-level code and your familiarity with containerization technologies like Docker, which are pluses for the role.</li>
+</ul>
+<ol start="7" type="1">
+<li>Body Paragraph 4: Cultural Fit and Soft Skills</li>
+</ol>
+<ul>
+<li>Discuss your passion for AI and machine learning, as evidenced by your personal blog and ongoing projects.</li>
+<li>Emphasize your ability to work collaboratively with cross-functional teams, a key requirement for the role.</li>
+<li>Reflect on your enthusiasm for contributing to a diverse and values-driven company like SoundHound AI.</li>
+</ul>
+<ol start="8" type="1">
+<li>Conclusion</li>
+</ol>
+<ul>
+<li>Reiterate your interest in the position and the value you would bring to SoundHound AI.</li>
+<li>Mention your availability for an interview and your willingness to provide further information or references.</li>
+<li>Thank the hiring team for considering your application.</li>
+</ul>
+<ol start="9" type="1">
+<li>Sign-off</li>
+</ol>
+<ul>
+<li>Professional closing (e.g., Sincerely, Best regards),</li>
+<li>Your Name</li>
+</ul>
+<ol start="10" type="1">
+<li>Notes/Instructions:</li>
+</ol>
+<ul>
+<li>Customize the cover letter with any specific names or details provided by SoundHound AI.</li>
+<li>Keep the tone professional and enthusiastic throughout the letter.</li>
+<li>Ensure that the cover letter is concise, ideally not exceeding one page.</li>
+<li>Proofread the cover letter for any grammatical or typographical errors before sending.</li>
+<li>If possible, research SoundHound AI’s core values and integrate them into your cover letter to demonstrate cultural alignment.</li>
+<li>Use metrics and specific examples to quantify your achievements and impact in previous roles.</li>
+<li>Align your technical skills and experiences with the job description to show you are a strong fit for the role.</li>
+</ul>
+</details>
+</section>
+</section>
+<section id="research-planner-agent" class="level3">
+<h3 class="anchored" data-anchor-id="research-planner-agent">3.2 Research Planner agent</h3>
+<img src="image/research1.jpeg" style="width:200px;height:200px;">
+<center>
+</center>
+<section id="research-planner-agent-creation-prompt" class="level4">
+<h4 class="anchored" data-anchor-id="research-planner-agent-creation-prompt">3.2.1 Research Planner agent creation prompt</h4>
+<details>
+<summary>
+<h5 style="display:inline-block" class="anchored">
+▶ See prompt
+</h5>
+</summary>
+<pre><code>    
+    "You are a researcher charged with providing information that can \
+be used when writing the following cover letter for the given job description. Generate a list of search queries that will gather \
+any relevant information. Focus on generating a search query that answers one specific question in detail. Have at least one question about the company. Only generate 3 queries max."
+    </code></pre>
+</details>
+</section>
+<section id="research-planner-agents-raw-output" class="level4">
+<h4 class="anchored" data-anchor-id="research-planner-agents-raw-output">3.2.2 Research Planner agent’s raw output</h4>
+<details>
+<summary>
+<h5 style="display:inline-block" class="anchored">
+▶ See generated search query
+</h5>
+</summary>
+<ul>
+<li>search query 1: how to write a cover letter for a software engineer position</li>
+<li>search query 2: best practices for highlighting machine learning experience in a cover letter</li>
+<li>search query 3: examples of cover letters for voice AI technology positions</li>
+</ul>
+</details>
+</section>
+<section id="research-planner-agents-online-search" class="level4">
+<h4 class="anchored" data-anchor-id="research-planner-agents-online-search">3.2.3 Research Planner agent’s online search</h4>
+<details>
+<summary>
+<h5 style="display:inline-block" class="anchored">
+▶ See returned search documents
+</h5>
+</summary>
+<ul>
+<li><p>search query 1:</p>
+<p>how to become a software engineer (2024 Guide) Software Engineer Cover Letter Examples BrainStation’s Software Engineer career guide is intended to help you take the first steps toward a career in software engineering. Here is a step-by-step guide to help you get started on your cover letter: 1.Write a strong introduction that will capture …</p>
+<p>Create the letter heading. The heading at the top of your letter includes your full name and contact information, making it easy for hiring managers to identify and contact you. Below your name, list your current phone number, email address and city and state…</p></li>
+<li><p>search query 2:</p>
+<p>Here are a few examples of Machine Learning Engineer cover letters. You can refer to these as you begin drafting your cover letter. Example 1. Dear [Hiring Manager Name], My passion for programming and expertise in implementing machine learning models would make me an excellent addition to your team…</p>
+<p>Make sure to highlight these skills in your cover letter. 3. <strong>Showcase Your Passion</strong>: Employers want to see that you are passionate about Machine Learning. You can demonstrate this by talking about any personal projects you’ve worked on, online courses you’ve taken, or books you’ve read on the subject. 4. …</p></li>
+<li><p>search query 3:</p>
+<p>An AI Cover Letter Generator is a tool that combines machine learning, natural language and artificial intelligence to create cover letters you can use to apply for jobs!. Complex algorithms power AI cover letter generators AI and can help you produce a custom letter quickly. Some will even scan your resume to echo your work experience descriptions, including the right resume skills and resume …</p>
+<p>In this article, we’ll look at how to use AI to write a cover letter. We’ll go over the steps to follow and give you an example of what an AI-helped cover letter might look like. By the end, you’ll have a better idea of how to use AI to make your job search easier. Remember, a cover letter is your chance to tell your story. AI can help you tell …</p></li>
+</ul>
+</details>
+</section>
+</section>
+<section id="writer-agent" class="level3">
+<h3 class="anchored" data-anchor-id="writer-agent">3.3 Writer agent</h3>
+<img src="image/writier1.jpeg" style="width:200px;height:200px;">
+<center>
+</center>
+<section id="write-agent-creation-prompt" class="level4">
+<h4 class="anchored" data-anchor-id="write-agent-creation-prompt">3.3.1 Write agent creation prompt</h4>
+<details>
+<summary>
+<h5 style="display:inline-block" class="anchored">
+▶ See prompt
+</h5>
+</summary>
+<pre><code>    
+    "You are an assistant tasked with writing excellent 3 to 5 paragraph cover letter including introduction, sales pitch and conclusion. \
+Generate the best cover letter possible for the applicant's chance of getting an interview at the job. \
+Make sure to address all the wants from job description and show that applicant is capable, one by one. \
+Think about the following strategy, 
+S - situation. Describe the situation
+T - task. Give details on what you had to do
+A - action. Give details on actions you have taken
+R - result. Describe the result of the situation
+\
+Additionally, consider using bold or underline font to grab attention appropriately. Do not overuse this styling method. \
+If the user provides critique, respond with a revised version of your previous attempts. \
+Utilize all the information below as needed: 
+
+------
+
+{content}"
+    </code></pre>
+</details>
+</section>
+<section id="write-agents-raw-output" class="level4">
+<h4 class="anchored" data-anchor-id="write-agents-raw-output">3.3.2 Write agent’s raw output</h4>
+<details>
+<summary>
+<h5 style="display:inline-block" class="anchored">
+▶ See generated draft
+</h5>
+</summary>
+<p>Dear SoundHound AI Hiring Team,</p>
+<p>I am writing to express my keen interest in the Software Engineer position at SoundHound AI, as advertised. With a Bachelor’s degree in Mathematics with minors in Computer Science and Statistics from the University of Toronto, a Data Scientist Nanodegree from Udacity, and extensive professional experience as a Data Scientist &amp; AI Lead, I am excited about the opportunity to contribute to your core speech technology team.</p>
+<p>In my current role at the Canadian Food Inspection Agency, I spearheaded the <strong>AI lead Finesse project</strong>, which revolutionized our internal document search engines by introducing semantic search capabilities. This initiative resulted in a <strong>130% improvement in search accuracy</strong>. Additionally, I led the Louis project, developing a ChatGPT-like virtual assistant that enhanced model output quality by <strong>132%</strong>. My expertise in <strong>NLP models</strong> and <strong>image classifiers</strong> has been instrumental in securely processing sensitive documents and automating agricultural compliance with a remarkable <strong>97%+ accuracy</strong>.</p>
+<p>My educational background has equipped me with a solid foundation in <strong>algorithm design, data structures, and software design</strong>, all of which are critical for the role at SoundHound AI. My technical skills are a strong match for your requirements, including proficiency in <strong>Python</strong>, experience with <strong>deep learning frameworks</strong>, and a track record of developing solutions using <strong>TensorFlow and PyTorch</strong>. I am also familiar with <strong>Kaldi</strong> and have successfully deployed models on-device using TensorFlow Lite.</p>
+<p>I am particularly drawn to SoundHound AI’s commitment to creating Voice AI products that enable natural interaction, and I am eager to apply my knowledge in <strong>ASR</strong>, <strong>machine learning</strong>, and <strong>deep learning techniques</strong> to help enhance your voice AI products. My experience in running benchmarks and optimizing ASR models aligns with the responsibilities outlined in the job description. Moreover, my ability to troubleshoot and resolve customer-related issues will ensure that I can provide tailored ASR solutions to meet specific challenges.</p>
+<p>SoundHound AI’s values resonate deeply with me, and I am enthusiastic about joining a company that prioritizes diversity, equity, inclusion, and belonging. I am confident that my collaborative spirit, problem-solving skills, and passion for innovation will make me a valuable addition to your team.</p>
+<p>Thank you for considering my application. I am looking forward to the opportunity to discuss how my skills and experiences align with SoundHound AI’s mission. Please feel free to contact me at your earliest convenience to schedule an interview.</p>
+<p>Sincerely, Jaekang Lee</p>
+</details>
+</section>
+</section>
+<section id="reflection-agent" class="level3">
+<h3 class="anchored" data-anchor-id="reflection-agent">3.4 Reflection agent</h3>
+<img src="image/reflect1.jpeg" style="width:200px;height:200px;">
+<center>
+</center>
+<section id="reflection-agent-creation-prompt" class="level4">
+<h4 class="anchored" data-anchor-id="reflection-agent-creation-prompt">3.4.1 Reflection agent creation prompt</h4>
+<details>
+<summary>
+<h5 style="display:inline-block" class="anchored">
+▶ See prompt
+</h5>
+</summary>
+<pre><code> """You are a professional hiring manager grading a candidate's cover letter for the team and potential interview. \
+Generate critique and recommendations for the applicant's submission. \
+Provide detailed recommendations, including requests for length, depth, style, missing skills, etc."""</code></pre>
+</details>
+</section>
+<section id="reflection-agent-critique" class="level4">
+<h4 class="anchored" data-anchor-id="reflection-agent-critique">3.4.2 Reflection agent critique</h4>
+<details>
+<summary>
+<h5 style="display:inline-block" class="anchored">
+▶ See generated critique
+</h5>
+</summary>
+<ol type="1">
+<li><strong>Introduction:</strong>
+<ul>
+<li>The introduction is clear and states the candidate’s interest and relevant educational background. However, it could be more engaging by briefly mentioning a specific aspect of SoundHound AI’s work that excites the candidate.</li>
+</ul></li>
+<li><strong>Relevance of Experience:</strong>
+<ul>
+<li>The candidate does a good job of highlighting relevant experience with specific projects and quantifiable achievements. However, the cover letter could benefit from a more detailed explanation of how these projects relate to the responsibilities of the Software Engineer position at SoundHound AI.</li>
+</ul></li>
+<li><strong>Technical Skills:</strong>
+<ul>
+<li>The technical skills mentioned are relevant and well-aligned with the job description. The candidate could enhance this section by providing brief examples of how they have applied these skills in a professional setting.</li>
+</ul></li>
+<li><strong>Company Values:</strong>
+<ul>
+<li>The candidate mentions alignment with the company’s values, which is good, but it would be more impactful if they provided an example of how they have demonstrated these values in their past work or personal initiatives.</li>
+</ul></li>
+<li><strong>Call to Action:</strong>
+<ul>
+<li>The closing paragraph includes a polite call to action, which is appropriate. However, it could be more assertive by suggesting a specific time frame for follow-up.</li>
+</ul></li>
+<li><strong>Length and Depth:</strong>
+<ul>
+<li>The cover letter is an appropriate length, but some paragraphs could be condensed to make the letter more concise. The depth of technical detail is good, but the candidate should ensure it does not overshadow their ability to work within a team or adapt to SoundHound AI’s specific work environment.</li>
+</ul></li>
+<li><strong>Style and Tone:</strong>
+<ul>
+<li>The tone is professional and demonstrates enthusiasm. However, the candidate could use more dynamic language to convey passion and drive.</li>
+</ul></li>
+</ol>
+<p><strong>Recommendations:</strong></p>
+<ol type="1">
+<li><strong>Introduction:</strong>
+<ul>
+<li>Start with a hook that shows personal connection or enthusiasm for SoundHound AI’s work or mission.</li>
+</ul></li>
+<li><strong>Relevance of Experience:</strong>
+<ul>
+<li>Provide a brief example of how past projects could directly translate to the role at SoundHound AI.</li>
+</ul></li>
+<li><strong>Technical Skills:</strong>
+<ul>
+<li>Include a short anecdote or case where the candidate’s technical skills led to a successful outcome.</li>
+</ul></li>
+<li><strong>Company Values:</strong>
+<ul>
+<li>Share a specific instance where the candidate has exemplified SoundHound AI’s values in their career.</li>
+</ul></li>
+<li><strong>Call to Action:</strong>
+<ul>
+<li>Suggest availability for an interview and express willingness to provide further details or work samples.</li>
+</ul></li>
+<li><strong>Length and Depth:</strong>
+<ul>
+<li>Edit for brevity where possible, ensuring each sentence adds value to the application.</li>
+</ul></li>
+<li><strong>Style and Tone:</strong>
+<ul>
+<li>Use more active voice and powerful verbs to create a dynamic and compelling narrative.</li>
+</ul></li>
+<li><strong>Missing Skills:</strong>
+<ul>
+<li>If the job description mentions skills or experiences not covered in the cover letter, the candidate should address them, even if it’s to say they are eager to learn or develop in those areas.</li>
+</ul></li>
+<li><strong>Proofreading:</strong>
+<ul>
+<li>Ensure there are no typos or grammatical errors. Consider having a third party review the letter for clarity and impact.</li>
+</ul></li>
+<li><strong>Personalization:</strong>
+<ul>
+<li>Address the letter to a specific person if the name is available. If not, “Dear SoundHound AI Hiring Team” is acceptable.</li>
+</ul></li>
+</ol>
+<p>By implementing these recommendations, the candidate’s cover letter will be more personalized, impactful, and aligned with the expectations of SoundHound AI’s hiring team.</p>
+</details>
+</section>
+</section>
+<section id="research-planner-agent-loop" class="level3">
+<h3 class="anchored" data-anchor-id="research-planner-agent-loop">3.5 Research Planner agent loop</h3>
+<img src="image/research2.jpeg" style="width:200px;height:200px;">
+<center>
+</center>
+<section id="research-planner-agent-creation-prompt-1" class="level4">
+<h4 class="anchored" data-anchor-id="research-planner-agent-creation-prompt-1">3.5.1 Research Planner agent creation prompt</h4>
+<details>
+<summary>
+<h5 style="display:inline-block" class="anchored">
+▶ See prompt
+</h5>
+</summary>
+<pre><code>    
+    "You are a researcher charged with providing information that can \
+be used when making any requested revisions (as outlined below). \
+Generate a list of search queries that will gather relevant and important information. Only generate 3 queries max."
+    </code></pre>
+</details>
+</section>
+<section id="research-planner-agent-raw-output" class="level4">
+<h4 class="anchored" data-anchor-id="research-planner-agent-raw-output">3.5.2 Research Planner agent raw output</h4>
+<details>
+<summary>
+<h5 style="display:inline-block" class="anchored">
+▶ See genearted search query
+</h5>
+</summary>
+<ul>
+<li>search query 1: how to write an engaging introduction for a cover letter</li>
+<li>search query 2: examples of demonstrating company values in professional experience</li>
+<li>search query 3: effective call to action phrases for cover letters</li>
+</ul>
+</details>
+</section>
+<section id="research-planner-agents-online-search-1" class="level4">
+<h4 class="anchored" data-anchor-id="research-planner-agents-online-search-1">3.5.3 Research Planner agent’s online search</h4>
+<details>
+<summary>
+<h5 style="display:inline-block" class="anchored">
+▶ See genearted search query
+</h5>
+</summary>
+<ul>
+<li><p>search query 1:</p>
+<p>You’ll get more into the details after your opening paragraph, of course. But your cover letter opener should still tell the reader, “This person can do something for us,” rather than, “This job would really help them.”. 4. Stick to the point. Your opener, while creative, should still be relevant to the job… The headline on the image says, “Cover letter format” A woman sits at a table writing on a piece of paper. There’s a simple cover letter represented by lines. On one side of the cover letter, there are labels for the sections of the cover letter. The labels are: 1. Date and contact information 2. Salutation/greeting 3. First, introduce yourself 4…</p></li>
+<li><p>search query 2:</p>
+<p>Your guide to company values (best practices + examples) Our personal values inform how we think, feel, and act. They direct our behaviors and guide us to a success we can be proud of. The same can be said of businesses’ core values. Core company values are the guiding principles or underlying rules that shape how organizations do business …</p></li>
+<li><p>search query 3:</p>
+<p>effective call to action phrases for cover letters</p>
+<p>When you write your call to action, make sure it remains polite, courteous and professional. Follow these steps to write an effective call to action for your cover letter: 1. Research the company and job description. Make sure your entire cover letter contains keywords mentioned in the requirements and preferences sections of the job description…</p>
+<p>Review several call-to-action examples for marketing, job posts, cover letters and websites to help you craft effective ones and understand why they work…</p></li>
+</ul>
+</details>
+</section>
+</section>
+<section id="writer-agent-loop" class="level3">
+<h3 class="anchored" data-anchor-id="writer-agent-loop">3.6 Writer agent loop</h3>
+<img src="image/writer2.jpeg" style="width:200px;height:200px;">
+<center>
+</center>
+<section id="write-agents-raw-output-1" class="level4">
+<h4 class="anchored" data-anchor-id="write-agents-raw-output-1">3.6.1 Write agent’s raw output</h4>
+<details>
+<summary>
+<h5 style="display:inline-block" class="anchored">
+▶ See generated final draft
+</h5>
+</summary>
+<p>Dear SoundHound AI Hiring Team,</p>
+<p>I am writing to express my keen interest in the Software Engineer position at SoundHound AI, as advertised. With a robust background in data science and AI, particularly in the realm of natural language processing and machine learning, I am excited about the opportunity to contribute to your core speech technology team. My professional journey has been marked by innovative projects and a deep commitment to advancing conversational AI, making me a strong fit for this role.</p>
+<p>As the AI Lead for the Finesse project, I spearheaded the development of a semantic search engine using embedded vector stores, which significantly modernized internal document retrieval, achieving <strong>130% more accurate results</strong> than the previous system. In the Louis project, I created a ChatGPT-like virtual assistant, enhancing user interactions by implementing agentic flow with LangGraph, which resulted in a <strong>132% increase in model output quality</strong>. My expertise extends to building advanced NLP models for secure processing of sensitive government documents and deploying image classifiers with a <strong>97%+ accuracy rate</strong>, streamlining compliance processes and outperforming human experts.</p>
+<p>My educational foundation from the University of Toronto, coupled with a Data Scientist Nanodegree from Udacity, has equipped me with a solid grasp of algorithms, data structures, and software design. I am proficient in Python and have hands-on experience with deep learning frameworks essential for ASR technologies. My technical skills are complemented by my success in Kaggle competitions and my proactive engagement in the AI community through my personal blog and innovative projects.</p>
+<p>The responsibilities outlined in the job description resonate with my experience and skills. I have a proven track record of training, tuning, and testing machine learning models, and I am adept at collaborating with cross-functional teams to integrate AI technologies into products. My experience with TensorFlow Lite and end-to-end ASR pipelines, along with my proficiency in production-level Python code, positions me to deliver high-quality ASR solutions and support SoundHound AI’s mission to make conversational intelligence universally accessible.</p>
+<p>SoundHound AI’s commitment to diversity, equity, inclusion, and belonging aligns with my professional ethos. I am eager to join a company where my unique voice can contribute to a team with global perspectives and where innovation is driven by a shared passion for excellence. I am available for an interview at your earliest convenience and can be reached at 778-929-6940 or via email at tonylee015@gmail.com. Thank you for considering my application. I look forward to the possibility of contributing to SoundHound AI’s success.</p>
+<p>Sincerely, Jaekang Lee</p>
+</details>
+</section>
+</section>
+</section>
+<section id="conclusion" class="level2">
+<h2 class="anchored" data-anchor-id="conclusion">4. Conclusion</h2>
+<p>There are areas for improvement.</p>
+<ol type="1">
+<li><p>The contents returned from Tavily search can be further refined by using RAG ranking-system. Increase quantity of returned documents.</p></li>
+<li><p>New better performing llms release quickly. Thanks to Langchain, we can swap out just the model from this pipeline.</p></li>
+</ol>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const disableStylesheet = (stylesheets) => {
+    for (let i=0; i < stylesheets.length; i++) {
+      const stylesheet = stylesheets[i];
+      stylesheet.rel = 'prefetch';
+    }
+  }
+  const enableStylesheet = (stylesheets) => {
+    for (let i=0; i < stylesheets.length; i++) {
+      const stylesheet = stylesheets[i];
+      stylesheet.rel = 'stylesheet';
+    }
+  }
+  const manageTransitions = (selector, allowTransitions) => {
+    const els = window.document.querySelectorAll(selector);
+    for (let i=0; i < els.length; i++) {
+      const el = els[i];
+      if (allowTransitions) {
+        el.classList.remove('notransition');
+      } else {
+        el.classList.add('notransition');
+      }
+    }
+  }
+  const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+    const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+    const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+    let newTheme = '';
+    if(darkModeDefault) {
+      newTheme = isAlternate ? baseTheme : alternateTheme;
+    } else {
+      newTheme = isAlternate ? alternateTheme : baseTheme;
+    }
+    const changeGiscusTheme = () => {
+      // From: https://github.com/giscus/giscus/issues/336
+      const sendMessage = (message) => {
+        const iframe = document.querySelector('iframe.giscus-frame');
+        if (!iframe) return;
+        iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+      }
+      sendMessage({
+        setConfig: {
+          theme: newTheme
+        }
+      });
+    }
+    const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+    if (isGiscussLoaded) {
+      changeGiscusTheme();
+    }
+  }
+  const toggleColorMode = (alternate) => {
+    // Switch the stylesheets
+    const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+    manageTransitions('#quarto-margin-sidebar .nav-link', false);
+    if (alternate) {
+      enableStylesheet(alternateStylesheets);
+      for (const sheetNode of alternateStylesheets) {
+        if (sheetNode.id === "quarto-bootstrap") {
+          toggleBodyColorMode(sheetNode);
+        }
+      }
+    } else {
+      disableStylesheet(alternateStylesheets);
+      toggleBodyColorPrimary();
+    }
+    manageTransitions('#quarto-margin-sidebar .nav-link', true);
+    // Switch the toggles
+    const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+    for (let i=0; i < toggles.length; i++) {
+      const toggle = toggles[i];
+      if (toggle) {
+        if (alternate) {
+          toggle.classList.add("alternate");     
+        } else {
+          toggle.classList.remove("alternate");
+        }
+      }
+    }
+    // Hack to workaround the fact that safari doesn't
+    // properly recolor the scrollbar when toggling (#1455)
+    if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+      manageTransitions("body", false);
+      window.scrollTo(0, 1);
+      setTimeout(() => {
+        window.scrollTo(0, 0);
+        manageTransitions("body", true);
+      }, 40);  
+    }
+  }
+  const isFileUrl = () => { 
+    return window.location.protocol === 'file:';
+  }
+  const hasAlternateSentinel = () => {  
+    let styleSentinel = getColorSchemeSentinel();
+    if (styleSentinel !== null) {
+      return styleSentinel === "alternate";
+    } else {
+      return false;
+    }
+  }
+  const setStyleSentinel = (alternate) => {
+    const value = alternate ? "alternate" : "default";
+    if (!isFileUrl()) {
+      window.localStorage.setItem("quarto-color-scheme", value);
+    } else {
+      localAlternateSentinel = value;
+    }
+  }
+  const getColorSchemeSentinel = () => {
+    if (!isFileUrl()) {
+      const storageValue = window.localStorage.getItem("quarto-color-scheme");
+      return storageValue != null ? storageValue : localAlternateSentinel;
+    } else {
+      return localAlternateSentinel;
+    }
+  }
+  const darkModeDefault = true;
+  let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+  // Dark / light mode switch
+  window.quartoToggleColorScheme = () => {
+    // Read the current dark / light value 
+    let toAlternate = !hasAlternateSentinel();
+    toggleColorMode(toAlternate);
+    setStyleSentinel(toAlternate);
+    toggleGiscusIfUsed(toAlternate, darkModeDefault);
+  };
+  // Ensure there is a toggle, if there isn't float one in the top right
+  if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+    const a = window.document.createElement('a');
+    a.classList.add('top-right');
+    a.classList.add('quarto-color-scheme-toggle');
+    a.href = "";
+    a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+    const i = window.document.createElement("i");
+    i.classList.add('bi');
+    a.appendChild(i);
+    window.document.body.appendChild(a);
+  }
+  // Switch to dark mode if need be
+  if (hasAlternateSentinel()) {
+    toggleColorMode(true);
+  } else {
+    toggleColorMode(false);
+  }
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    // For code content inside modals, clipBoardJS needs to be initialized with a container option
+    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

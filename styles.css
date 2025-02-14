@@ -1,0 +1,11 @@
+/* css styles */
+/* Custom styles for dark mode */
+@media (prefers-color-scheme: dark) {
+    .quarto-title-block .quarto-title-banner {
+      background-color: #4a0e4e; /* Dark purple color */
+    }
+    
+    .quarto-title-block .quarto-title-subheader {
+      background-color: #4a0e4e; /* Dark purple color */
+    }
+  }

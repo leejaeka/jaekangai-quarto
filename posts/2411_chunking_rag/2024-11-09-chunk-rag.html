@@ -1,0 +1,1247 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.5.52">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Jaekang Lee">
+<meta name="dcterms.date" content="2024-11-09">
+<meta name="description" content="Remove awkward chunks and find out if multiplying your dataset by translating to other language helps RAG search.">
+
+<title>Contextual chunking RAG + Multilingual embedding – jaekangai-quarto</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-dark.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-dark.min.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+
+<link rel="stylesheet" href="../../styles.css">
+</head>
+
+<body class="nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top quarto-banner">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">jaekangai-quarto</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../about.html"> 
+<span class="menu-text">About</span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/"> <i class="bi bi-github" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://twitter.com"> <i class="bi bi-twitter" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title">Contextual chunking RAG + Multilingual embedding</h1>
+                  <div>
+        <div class="description">
+          Remove awkward chunks and find out if multiplying your dataset by translating to other language helps RAG search.
+        </div>
+      </div>
+                          <div class="quarto-categories">
+                <div class="quarto-category">ml</div>
+                <div class="quarto-category">RAG</div>
+                <div class="quarto-category">experiment</div>
+              </div>
+                  </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      <div>
+      <div class="quarto-title-meta-heading">Author</div>
+      <div class="quarto-title-meta-contents">
+               <p>Jaekang Lee </p>
+            </div>
+    </div>
+      
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">November 9, 2024</p>
+      </div>
+    </div>
+    
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction">0. Introduction</a></li>
+  <li><a href="#contextual-chunking" id="toc-contextual-chunking" class="nav-link" data-scroll-target="#contextual-chunking">0.1 Contextual chunking</a></li>
+  <li><a href="#fixed-size-chunking" id="toc-fixed-size-chunking" class="nav-link" data-scroll-target="#fixed-size-chunking">0.2 Fixed-size chunking</a></li>
+  <li><a href="#experiment-design" id="toc-experiment-design" class="nav-link" data-scroll-target="#experiment-design">1. Experiment design</a></li>
+  <li><a href="#data" id="toc-data" class="nav-link" data-scroll-target="#data">2. Data</a></li>
+  <li><a href="#generate-true-statements." id="toc-generate-true-statements." class="nav-link" data-scroll-target="#generate-true-statements.">3. Generate True statements.</a></li>
+  <li><a href="#chunking" id="toc-chunking" class="nav-link" data-scroll-target="#chunking">4. Chunking</a>
+  <ul class="collapse">
+  <li><a href="#fixed-chunking" id="toc-fixed-chunking" class="nav-link" data-scroll-target="#fixed-chunking">4.1 Fixed chunking</a></li>
+  <li><a href="#contextual-chunking-1" id="toc-contextual-chunking-1" class="nav-link" data-scroll-target="#contextual-chunking-1">4.2 Contextual chunking</a></li>
+  </ul></li>
+  <li><a href="#generate-embeddings." id="toc-generate-embeddings." class="nav-link" data-scroll-target="#generate-embeddings.">5. Generate embeddings.</a>
+  <ul class="collapse">
+  <li><a href="#vector-store" id="toc-vector-store" class="nav-link" data-scroll-target="#vector-store">5.1 Vector Store</a></li>
+  </ul></li>
+  <li><a href="#evaluation" id="toc-evaluation" class="nav-link" data-scroll-target="#evaluation">6. Evaluation</a>
+  <ul class="collapse">
+  <li><a href="#evaluate-with-top-3-returns." id="toc-evaluate-with-top-3-returns." class="nav-link" data-scroll-target="#evaluate-with-top-3-returns.">6.1 Evaluate with top 3 returns.</a></li>
+  </ul></li>
+  <li><a href="#summary" id="toc-summary" class="nav-link" data-scroll-target="#summary">7. Summary</a>
+  <ul class="collapse">
+  <li><a href="#limitation" id="toc-limitation" class="nav-link" data-scroll-target="#limitation">7.1 Limitation</a></li>
+  </ul></li>
+  <li><a href="#next-steps" id="toc-next-steps" class="nav-link" data-scroll-target="#next-steps">8. Next steps</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+
+
+
+
+<p><img src="cubes.jpeg" style="width:300px;height:200px;"></p>
+<section id="introduction" class="level2">
+<h2 class="anchored" data-anchor-id="introduction">0. Introduction</h2>
+<p>Chunking is a complicated step in RAG.</p>
+<p>Popular chunking strategies (2024)</p>
+<ul>
+<li><a href="https://www.pinecone.io/learn/chunking-strategies/">Fixed-size chunking</a> - This is the most common and straightforward approach to chunking. “Contain as much information in each chunk”</li>
+<li><a href="https://stackoverflow.blog/2024/06/06/breaking-up-is-hard-to-do-chunking-in-rag-applications/">Recursive chunking with overlap</a> - This strategy divides the input text into smaller chunks in a hierarchical and iterative manner using a set of separators. It aims to keep semantically related pieces of text together while maintaining a target chunk size.</li>
+<li><a href="https://addaxis.ai/advanced-chunking-strategies-for-rag/">Context-aware chunking</a> - This technique splits documents based on semantic markers such as punctuation, paragraph breaks, or HTML/Markdown tags. Effective for documents with well-defined structures.</li>
+</ul>
+<p>There is no one chunking strategy that works for every situation. In this notebook, I’m going compare Fixed-size chunking and <a href="https://www.anthropic.com/news/contextual-retrieval">Contextual chunking by Anthropic</a>.</p>
+</section>
+<section id="contextual-chunking" class="level2">
+<h2 class="anchored" data-anchor-id="contextual-chunking">0.1 Contextual chunking</h2>
+<ul>
+<li>A method that significantly improves the retrieval step in RAG by prepending chunk-specific explanatory context to each chunk before embedding.</li>
+<li>Convincing improvement of 67% when combined with BM25 index and reranking.</li>
+<li>Similar to data augmentation in computer vision. (A cat picture rotated 90 degree is still a cat)</li>
+</ul>
+</section>
+<section id="fixed-size-chunking" class="level2">
+<h2 class="anchored" data-anchor-id="fixed-size-chunking">0.2 Fixed-size chunking</h2>
+<ul>
+<li>Quick method that randomly chunks at fixed size. Great for assuring the size is within embedding model contextwindow size.</li>
+<li>Cons: chunks may be awkward. For example, a QnA string may be separted into just Question.</li>
+</ul>
+</section>
+<section id="experiment-design" class="level2">
+<h2 class="anchored" data-anchor-id="experiment-design">1. Experiment design</h2>
+<p>To test full RAG pipeline with different chunking strategies, I am going to use <a href="https://jaekang.quarto.pub/jaekangai-quarto/posts/2410_evaluate_rag/2024-10-20-eval-rag.html">true/false evaluation</a>.</p>
+<p>To briefly summarise the true/false evaluation - Generate ground truth facts on ground truth chunks. RAG will be tested to recognize these truth facts from vector search.</p>
+</section>
+<section id="data" class="level2">
+<h2 class="anchored" data-anchor-id="data">2. Data</h2>
+<p>To experiment this idea, I am going to use the following data - <a href="https://github.com/MrJay10/banking-faq-bot/blob/master/BankFAQs.csv">FAQ_bank.csv</a> has 1764 rows of ‘Question’ and ‘Answer’ string data. For this experiment, ‘category’ was ignored</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: center;"><img src="2024-11-09-chunk-rag_files/figure-html/cell-4-1-image.png" class="img-fluid" alt="image.png"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;"><a href="https://github.com/MrJay10/banking-faq-bot/blob/master/BankFAQs.csv">FAQ_bank.csv</a></td>
+</tr>
+</tbody>
+</table>
+<p>*Note: Ground truth chunks will be Question and Answer merged in a nice format. The ground truth chunks will then be appended into a single long string to be chunked.</p>
+<p>For example,</p>
+<ul>
+<li>original ground truth chunk - {“Question”:“How do I login?”, “Answer”:“click login button”}</li>
+<li>merged ground truth chunk - “Question: How do I login?: click login button”</li>
+<li>test data in a single string - “Question: q1: a1: q2: a2…”</li>
+</ul>
+</section>
+<section id="generate-true-statements." class="level2">
+<h2 class="anchored" data-anchor-id="generate-true-statements.">3. Generate True statements.</h2>
+<p>Each merged ground truth chunk was input into GTP4o which generated a fact. Some QnA were large enough to generate multiple facts so dynamic number was chosen depending on length of a QnA. For example, if QnA had over 2000 characters, 4 facts were generated, if less than 1000 characters, only one fact was generated.</p>
+<p>2865 facts were gnerated from 1764 QnAs.</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: center;"><img src="2024-11-09-chunk-rag_files/figure-html/cell-6-1-image.png" class="img-fluid" alt="image.png"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;">Prompt: <code>"From the following context, create "+ str(n) +" many truthful facts in bullet point forms. For example: 1. Telus is a Canadian company.\n2. Toronto is city of Ontraio, Canada.\nContext:</code><code>".format(context)</code></td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">Where <code>n</code>=number of fact to generate, <code>context</code>=QnA in English</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">Note that <a href="https://learn.microsoft.com/en-us/azure/ai-services/openai/concepts/models?tabs=python-secure">Azure GPT4o</a> was used with <code>temperature=0.1</code></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="chunking" class="level2">
+<h2 class="anchored" data-anchor-id="chunking">4. Chunking</h2>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 100%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: center;">Quick overview of chunking flow</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;"><img src="2024-11-09-chunk-rag_files/figure-html/cell-7-1-image-3.png" class="img-fluid" alt="image-3.png"></td>
+</tr>
+</tbody>
+</table>
+<section id="fixed-chunking" class="level3">
+<h3 class="anchored" data-anchor-id="fixed-chunking">4.1 Fixed chunking</h3>
+<ol type="1">
+<li><p>Take a large text input (one string) and split it first into documents (based on a maximum document size)</p></li>
+<li><p>Then splits each document into smaller chunks (based on a maximum chunk size)</p></li>
+<li><p>Can be configured to respect sentence boundaries (not cutting in the middle of sentences)</p></li>
+<li><p>Allows for overlap between chunks to maintain context (by keeping some sentences from the previous chunk)</p></li>
+<li><p>Returns a list of dictionaries, where each dictionary contains:</p>
+<ul>
+<li>A unique document ID</li>
+<li>The full document content</li>
+<li>A unique chunk ID</li>
+<li>The chunk content</li>
+</ul></li>
+</ol>
+<p>Below is python function that achieves this.</p>
+<details>
+<summary>
+Click to show/hide code
+</summary>
+<pre><code>
+import nltk
+import uuid
+import re
+from typing import List, Dict, Optional
+from nltk.tokenize import sent_tokenize
+
+def chunk_document(
+    text: str,
+    max_doc_size: int = 5000,
+    max_chunk_size: int = 1000,
+    overlap_sentences: int = 1,
+    respect_sentences: bool = True
+) -&gt; List[Dict]:
+    """
+    Chunk text into documents and then into smaller chunks with a flattened output structure.
+    
+    Args:
+        text: Input text to chunk
+        max_doc_size: Maximum size of each document in characters
+        max_chunk_size: Maximum size of each chunk within documents
+        overlap_sentences: Number of sentences to overlap between chunks
+        respect_sentences: Whether to avoid splitting in the middle of sentences
+        
+    Returns:
+        List of dictionaries, each containing:
+        - doc_id: Unique identifier for the document
+        - document: Full document content
+        - chunk_id: Unique identifier for the chunk
+        - chunk: The chunk content
+    """
+    # Initialize NLTK if needed
+    try:
+        nltk.data.find('tokenizers/punkt')
+    except LookupError:
+        nltk.download('punkt')
+    
+    # Normalize text
+    text = re.sub(r'\n+', '\n', text)
+    text = re.sub(r'\s+', ' ', text)
+    text = text.strip()
+    
+    # Split into documents
+    documents = []
+    if respect_sentences:
+        sentences = sent_tokenize(text)
+        current_doc = []
+        current_length = 0
+        
+        for sentence in sentences:
+            sentence_length = len(sentence)
+            
+            if current_length + sentence_length &gt; max_doc_size and current_doc:
+                doc_id = str(uuid.uuid4())
+                doc_content = " ".join(current_doc)
+                documents.append({
+                    'doc_id': doc_id,
+                    'content': doc_content
+                })
+                current_doc = []
+                current_length = 0
+            
+            current_doc.append(sentence)
+            current_length += sentence_length
+        
+        if current_doc:
+            doc_id = str(uuid.uuid4())
+            doc_content = " ".join(current_doc)
+            documents.append({
+                'doc_id': doc_id,
+                'content': doc_content
+            })
+    else:
+        start = 0
+        while start &lt; len(text):
+            doc_id = str(uuid.uuid4())
+            doc_content = text[start:start + max_doc_size]
+            documents.append({
+                'doc_id': doc_id,
+                'content': doc_content
+            })
+            start += max_doc_size
+    
+    # Process each document into chunks and flatten the structure
+    flattened_chunks = []
+    
+    for doc in documents:
+        doc_id = doc['doc_id']
+        doc_content = doc['content']
+        sentences = sent_tokenize(doc_content)
+        
+        current_chunk = []
+        current_length = 0
+        chunk_counter = 0
+        
+        for i in range(len(sentences)):
+            sentence = sentences[i]
+            sentence_length = len(sentence)
+            
+            if current_length + sentence_length &gt; max_chunk_size and current_chunk:
+                chunk_id = f"{doc_id}_chunk_{chunk_counter}"
+                chunk_text = " ".join(current_chunk)
+                
+                flattened_chunks.append({
+                    'doc_id': doc_id,
+                    'document': doc_content,
+                    'chunk_id': chunk_id,
+                    'chunk': chunk_text
+                })
+                
+                chunk_counter += 1
+                current_chunk = current_chunk[-overlap_sentences:] if overlap_sentences &gt; 0 else []
+                current_length = sum(len(s) for s in current_chunk)
+            
+            current_chunk.append(sentence)
+            current_length += sentence_length
+        
+        # Add remaining chunk if exists
+        if current_chunk:
+            chunk_id = f"{doc_id}_chunk_{chunk_counter}"
+            chunk_text = " ".join(current_chunk)
+            
+            flattened_chunks.append({
+                'doc_id': doc_id,
+                'document': doc_content,
+                'chunk_id': chunk_id,
+                'chunk': chunk_text
+            })
+    
+    return flattened_chunks
+
+</code></pre>
+</details>
+<script>
+const details = [...document.querySelectorAll('details')];
+details.forEach((detail) => {
+  detail.addEventListener('toggle', (e) => {
+    if (e.target.open) {
+      details.forEach((d) => {
+        if (d !== e.target) {
+          d.open = false;
+        }
+      });
+    }
+  });
+});
+</script>
+<p>The chunk size chosen for this experiment are as follows:</p>
+<ul>
+<li>maximum document size = 2666</li>
+<li>maximum chunk size = 200, 500, 1000 were tested</li>
+<li>Note: maximum contextwindow size (response) = 4096 for GPT4o. This meant that in generation step of RAG, top k returned chunks sizes plus query size had to be less than 4096.</li>
+</ul>
+</section>
+<section id="contextual-chunking-1" class="level3">
+<h3 class="anchored" data-anchor-id="contextual-chunking-1">4.2 Contextual chunking</h3>
+<ol type="1">
+<li><p>Take the chunks from <a href="#41-fixed-chunking">fixed chunking</a>.</p></li>
+<li><p>For each chunk, pass it to GPT4o along with its parent document chunk into following prompt (GPT4o’s output is contextualized text):</p>
+<details>
+<summary>
+<p>Click to show/hide prompt</p>
+</summary>
+<p>”</p>
+<pre><code>
+         {doc_content}
+         """
+         Here is the chunk we want to situate within the whole document
+         {chunk_content}
+
+         Please give a short succinct context to situate this chunk within the overall document for the purposes of improving search retrieval of the chunk.
+         Answer only with the succinct context and nothing else.
+ </code></pre></details></li>
+</ol>
+
+<script>
+const details = [...document.querySelectorAll('details')];
+details.forEach((detail) => {
+  detail.addEventListener('toggle', (e) => {
+    if (e.target.open) {
+      details.forEach((d) => {
+        if (d !== e.target) {
+          d.open = false;
+        }
+      });
+    }
+  });
+});
+</script>
+<ol start="3" type="1">
+<li>Finally, we merge contextualized text and original chunk text.</li>
+</ol>
+<p>Now we have three different contextual texts that were made of max chunk size 200, 500, 1000.</p>
+<p>Below is an example of one contextualized text along with its doc_id, chunk_id, chunk and document in json format.</p>
+<details>
+<summary>
+Click to show/hide example
+</summary>
+<pre><code>
+{'doc_id': '341daccf-2455-4ebc-907c-e736bfedcf88','chunk_id': '341daccf-2455-4ebc-907c-e736bfedcf88_chunk_0','contextualized_content': 'This chunk provides instructions on entering card details during a secure IVR transaction, the necessary details required, how to obtain an IVR password, and the process for registering a mobile number for IVR password requests.',
+  'chunk': "Do I need to enter ‘#’ after keying in my Card number/ Card expiry date/ CVV numberPlease listen to the recorded message and follow the instructions while entering your card details. What details are required when I want to perform a secure IVR transactionTo perform a secure IVR transaction, you will need your 16-digit Card number, Card expiry date, CVV number, mobile number and IVR password. How should I get the IVR Password if I hold an add-on cardAn IVR password can be requested only from the registered mobile number and will be sent to the registered mobile number / email ID of the primary card holder only. How do I register my Mobile number for IVR Password Please call our Customer Service Centre and ensure that your mobile number is updated in our records. How can I obtain an IVR Password By Sending SMS request: Send an SMS 'PWD<space>1234' to 9717465555 or to 5676712 from your registered (with Bank) mobile number.",'document': "Do I need to enter ‘#’ after keying in my Card number/ Card expiry date/ CVV numberPlease listen to the recorded message and follow the instructions while entering your card details. What details are required when I want to perform a secure IVR transactionTo perform a secure IVR transaction, you will need your 16-digit Card number, Card expiry date, CVV number, mobile number and IVR password. How should I get the IVR Password if I hold an add-on cardAn IVR password can be requested only from the registered mobile number and will be sent to the registered mobile number / email ID of the primary card holder only. How do I register my Mobile number for IVR Password Please call our Customer Service Centre and ensure that your mobile number is updated in our records. How can I obtain an IVR Password By Sending SMS request: Send an SMS 'PWD<space>1234' to 9717465555 or to 5676712 from your registered (with Bank) mobile number. (Note: 1234 are the last 4 digits of your HDFC Bank Credit Card number). You will receive an SMS with the IVR password on the same number. From HDFC Bank Website: If you have registered your card for NetSafe/ Verified by Visa/ MasterCard SecureCode, you can also login in to your NetSafe/ Verified by Visa/ MasterCard SecureCode account and use the Generate IVR Password option available on the left menu. The IVR password will be sent to your registered mobile number and email ID. These are the most convenient and recommended options. To ensure convenience, make a note of the IVR password and keep it handy while performing the transaction. Note: Kindly ensure that your latest mobile number and email ID is updated with us. Premium SMS charges as per your mobile service provider will apply for an SMS sent to 5676712 View more Can I use the same IVR Password to perform multiple transactionsNo, each IVR password can be used only for a maximum of 3 attempts (including decline attempts) within the specified validity period. For further transaction attempts, a new IVR password must be generated. Can I generate multiple IVR PasswordsNo, only one IVR password can be generated at a time. Only when the first one is used / expires, can the next IVR password be generated. How do I register for IVR passwordThere is no registration process. However you will have to obtain a 3D Secure IVR password to perform a secure IVR transaction by sending an SMS prior to the transaction or through NetSafe/ Verified by Visa/ MasterCard SecureCode login account (as mentioned above)."}
+</space></space></code></pre>
+</details>
+<script>
+const details = [...document.querySelectorAll('details')];
+details.forEach((detail) => {
+  detail.addEventListener('toggle', (e) => {
+    if (e.target.open) {
+      details.forEach((d) => {
+        if (d !== e.target) {
+          d.open = false;
+        }
+      });
+    }
+  });
+});
+</script>
+</section>
+</section>
+<section id="generate-embeddings." class="level2">
+<h2 class="anchored" data-anchor-id="generate-embeddings.">5. Generate embeddings.</h2>
+<p>Here, we embed 6 different embeddings.Theoretically, the bigger the chunk size, more information is contained in the chunk. But smaller chunk may be more precise when retrieving specific information.</p>
+<ol type="1">
+<li>Chunk size 200</li>
+<li>Chunk size 500</li>
+<li>Chunk size 1000</li>
+<li>Chunk size 200 with contextualization</li>
+<li>Chunk size 500 with contextualization</li>
+<li>Chunk size 1000 with contextualization</li>
+</ol>
+<p>Embeddings doesn’t mean anything to human, but we can use visualisations and clustering in particular to turn embeddings into something useful for human.</p>
+<p>Consider the following 2D vector space of “chunk size 200 with contextualization” embeddings. <a href="https://atlas.nomic.ai/data/tonylee015/bank-faq-contextualized-chunk200-embed-1/map/dd37d093-25b2-4b09-9bb4-3fc604492a26#BZJ8">Click to open interative map</a></p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="2024-11-09-chunk-rag_files/figure-html/cell-15-1-image.png" class="img-fluid figure-img"></p>
+<figcaption>image.png</figcaption>
+</figure>
+</div>
+<p>For example, observe that there are multiple types of insurance clusters both big and small (Health, travel, life, etc insurances) and they are separated apart by distance from banking services cluster groups.</p>
+<p>To understand simply, this embedding model read, understood the English chunks and then translated into their own ‘machine language’. Note that the actual vectors are dimensions of 1024 so actual vector space would be too complex for us to understand.</p>
+<section id="vector-store" class="level3">
+<h3 class="anchored" data-anchor-id="vector-store">5.1 Vector Store</h3>
+<p>Here, we use <a href="https://engineering.fb.com/2017/03/29/data-infrastructure/faiss-a-library-for-efficient-similarity-search/">faiss vector database</a> to store raw text and its embedding. Faiss vector db supports k-means clustering, proximity graph-based methods and most importantly similarity search for our RAG.</p>
+<p>Note: for this experiment, cosine similarity was used to calculate closest vector to test queries.</p>
+<p>There are tons of other vector databases available such as Redis, Pinecone, Postgresql, etc. Therefore, TODO</p>
+</section>
+</section>
+<section id="evaluation" class="level2">
+<h2 class="anchored" data-anchor-id="evaluation">6. Evaluation</h2>
+<p>Following prompt was used to evaluate RAG. Using Azure GPT4o with <code>temperature=0</code></p>
+<pre><code>        prompt = f"""
+        Is the following statement true? 
+        Statement: ```{query}```
+        Answer only in True or False. Do not explain.
+        Use the following ground truth documents of Questions and Answers.
+
+        Documents: 
+        ```
+        {combined_context}
+        ```
+        """</code></pre>
+<p>Where <code>query</code> = generated facts from <a href="#3-generate-true-statements">step 3.2</a> in English and <code>combined_context</code>=returned documents from vector similarity search.</p>
+<section id="evaluate-with-top-3-returns." class="level3">
+<h3 class="anchored" data-anchor-id="evaluate-with-top-3-returns.">6.1 Evaluate with top 3 returns.</h3>
+<p>Note: Ground truth label is all True.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 22%">
+<col style="width: 19%">
+<col style="width: 19%">
+<col style="width: 19%">
+<col style="width: 19%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Chunking strategy</th>
+<th>Accuracy</th>
+<th>Fail</th>
+<th>True</th>
+<th>False</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>chunk max length 500 + top 3 return</td>
+<td>92.15%</td>
+<td>40</td>
+<td>2596</td>
+<td>221</td>
+</tr>
+<tr class="even">
+<td>chunk max length 500 + top 3 return + contextual</td>
+<td>91.95%</td>
+<td>48</td>
+<td>2583</td>
+<td>226</td>
+</tr>
+<tr class="odd">
+<td>chunk max length 1000 + top 3 return</td>
+<td>88.37%</td>
+<td>54</td>
+<td>2477</td>
+<td>326</td>
+</tr>
+<tr class="even">
+<td>chunk max length 1000 + top 3 return + contextual</td>
+<td>88.11%</td>
+<td>56</td>
+<td>2468</td>
+<td>333</td>
+</tr>
+<tr class="odd">
+<td>chunk max length 200 + top 3 return</td>
+<td>91.73%</td>
+<td>38</td>
+<td>2586</td>
+<td>233</td>
+</tr>
+<tr class="even">
+<td>chunk max length 200 + top 3 return + contextual</td>
+<td>92.56%</td>
+<td>34</td>
+<td>2613</td>
+<td>210</td>
+</tr>
+<tr class="odd">
+<td>chunk max length 200 + top 10 return + contextual</td>
+<td><strong>95.16%</strong></td>
+<td>70</td>
+<td>2652</td>
+<td>135</td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="summary" class="level1">
+<h1>7. Summary</h1>
+<ul>
+<li>Chunks with max length 200 plus contextual strategy got the highest accuracy.</li>
+<li>Additionally, retrieving top 10 in vector search instead of top 3 improved the accuracy significantly by 2.6%.</li>
+<li>Most interesting is that for chunk max length 500 and 1000, contextual strategy actually decreased the accuracy. One reason may be because the contextual + chunk may have gotten too big for accurate and precise retrieval.</li>
+<li><code>Fail</code> column is llm fails due to token size exceeding GPT4o’s contextwindow size of 4096. Notice that the longer the chunk and more top k returned, more failed llm calls.</li>
+</ul>
+<section id="limitation" class="level2">
+<h2 class="anchored" data-anchor-id="limitation">7.1 Limitation</h2>
+<ul>
+<li>Running this evaluation is costly because it requires new embedding calls for new chunks and each chunk need a contextual call separately.</li>
+<li>Therefore, although we can try other chunk max size such as 100, 150, 199, 201, etc, finding most optimized chunk length is going to be heavy.</li>
+<li>To address failed query we can do the following, 1. Use llm with bigger context window size 2. Chunk smaller 3. return less top k</li>
+</ul>
+</section>
+</section>
+<section id="next-steps" class="level1">
+<h1>8. Next steps</h1>
+<ul>
+<li>Multimodal embedding (image, videos, pdfs, etc)</li>
+<li>Vector store comparison (Latency, semancitc caching)</li>
+</ul>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const disableStylesheet = (stylesheets) => {
+    for (let i=0; i < stylesheets.length; i++) {
+      const stylesheet = stylesheets[i];
+      stylesheet.rel = 'prefetch';
+    }
+  }
+  const enableStylesheet = (stylesheets) => {
+    for (let i=0; i < stylesheets.length; i++) {
+      const stylesheet = stylesheets[i];
+      stylesheet.rel = 'stylesheet';
+    }
+  }
+  const manageTransitions = (selector, allowTransitions) => {
+    const els = window.document.querySelectorAll(selector);
+    for (let i=0; i < els.length; i++) {
+      const el = els[i];
+      if (allowTransitions) {
+        el.classList.remove('notransition');
+      } else {
+        el.classList.add('notransition');
+      }
+    }
+  }
+  const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+    const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+    const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+    let newTheme = '';
+    if(darkModeDefault) {
+      newTheme = isAlternate ? baseTheme : alternateTheme;
+    } else {
+      newTheme = isAlternate ? alternateTheme : baseTheme;
+    }
+    const changeGiscusTheme = () => {
+      // From: https://github.com/giscus/giscus/issues/336
+      const sendMessage = (message) => {
+        const iframe = document.querySelector('iframe.giscus-frame');
+        if (!iframe) return;
+        iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+      }
+      sendMessage({
+        setConfig: {
+          theme: newTheme
+        }
+      });
+    }
+    const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+    if (isGiscussLoaded) {
+      changeGiscusTheme();
+    }
+  }
+  const toggleColorMode = (alternate) => {
+    // Switch the stylesheets
+    const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+    manageTransitions('#quarto-margin-sidebar .nav-link', false);
+    if (alternate) {
+      enableStylesheet(alternateStylesheets);
+      for (const sheetNode of alternateStylesheets) {
+        if (sheetNode.id === "quarto-bootstrap") {
+          toggleBodyColorMode(sheetNode);
+        }
+      }
+    } else {
+      disableStylesheet(alternateStylesheets);
+      toggleBodyColorPrimary();
+    }
+    manageTransitions('#quarto-margin-sidebar .nav-link', true);
+    // Switch the toggles
+    const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+    for (let i=0; i < toggles.length; i++) {
+      const toggle = toggles[i];
+      if (toggle) {
+        if (alternate) {
+          toggle.classList.add("alternate");     
+        } else {
+          toggle.classList.remove("alternate");
+        }
+      }
+    }
+    // Hack to workaround the fact that safari doesn't
+    // properly recolor the scrollbar when toggling (#1455)
+    if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+      manageTransitions("body", false);
+      window.scrollTo(0, 1);
+      setTimeout(() => {
+        window.scrollTo(0, 0);
+        manageTransitions("body", true);
+      }, 40);  
+    }
+  }
+  const isFileUrl = () => { 
+    return window.location.protocol === 'file:';
+  }
+  const hasAlternateSentinel = () => {  
+    let styleSentinel = getColorSchemeSentinel();
+    if (styleSentinel !== null) {
+      return styleSentinel === "alternate";
+    } else {
+      return false;
+    }
+  }
+  const setStyleSentinel = (alternate) => {
+    const value = alternate ? "alternate" : "default";
+    if (!isFileUrl()) {
+      window.localStorage.setItem("quarto-color-scheme", value);
+    } else {
+      localAlternateSentinel = value;
+    }
+  }
+  const getColorSchemeSentinel = () => {
+    if (!isFileUrl()) {
+      const storageValue = window.localStorage.getItem("quarto-color-scheme");
+      return storageValue != null ? storageValue : localAlternateSentinel;
+    } else {
+      return localAlternateSentinel;
+    }
+  }
+  const darkModeDefault = true;
+  let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+  // Dark / light mode switch
+  window.quartoToggleColorScheme = () => {
+    // Read the current dark / light value 
+    let toAlternate = !hasAlternateSentinel();
+    toggleColorMode(toAlternate);
+    setStyleSentinel(toAlternate);
+    toggleGiscusIfUsed(toAlternate, darkModeDefault);
+  };
+  // Ensure there is a toggle, if there isn't float one in the top right
+  if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+    const a = window.document.createElement('a');
+    a.classList.add('top-right');
+    a.classList.add('quarto-color-scheme-toggle');
+    a.href = "";
+    a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+    const i = window.document.createElement("i");
+    i.classList.add('bi');
+    a.appendChild(i);
+    window.document.body.appendChild(a);
+  }
+  // Switch to dark mode if need be
+  if (hasAlternateSentinel()) {
+    toggleColorMode(true);
+  } else {
+    toggleColorMode(false);
+  }
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    // For code content inside modals, clipBoardJS needs to be initialized with a container option
+    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

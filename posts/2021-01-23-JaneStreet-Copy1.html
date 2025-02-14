@@ -1,0 +1,1508 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.5.52">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Jaekang Lee">
+<meta name="dcterms.date" content="2021-01-23">
+
+<title>Jane Street Market EDA 📈 – jaekangai-quarto</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script><script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<script src="../site_libs/quarto-html/quarto.js"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-dark.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-dark.min.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
+
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="../styles.css">
+</head>
+
+<body class="nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top quarto-banner">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../index.html">
+    <span class="navbar-title">jaekangai-quarto</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../about.html"> 
+<span class="menu-text">About</span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/"> <i class="bi bi-github" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://twitter.com"> <i class="bi bi-twitter" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title">Jane Street Market EDA 📈</h1>
+                                <div class="quarto-categories">
+                <div class="quarto-category">EDA</div>
+                <div class="quarto-category">Kaggle</div>
+              </div>
+                  </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      <div>
+      <div class="quarto-title-meta-heading">Author</div>
+      <div class="quarto-title-meta-contents">
+               <p>Jaekang Lee </p>
+            </div>
+    </div>
+      
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">January 23, 2021</p>
+      </div>
+    </div>
+    
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#jane-street-market-eda" id="toc-jane-street-market-eda" class="nav-link active" data-scroll-target="#jane-street-market-eda">Jane Street Market EDA 📈</a>
+  <ul class="collapse">
+  <li><a href="#project-definition" id="toc-project-definition" class="nav-link" data-scroll-target="#project-definition">Project Definition 🏆</a></li>
+  <li><a href="#eda-and-visualization" id="toc-eda-and-visualization" class="nav-link" data-scroll-target="#eda-and-visualization">EDA and Visualization</a>
+  <ul class="collapse">
+  <li><a href="#import-data" id="toc-import-data" class="nav-link" data-scroll-target="#import-data">Import Data 📚</a></li>
+  <li><a href="#cleaning-data" id="toc-cleaning-data" class="nav-link" data-scroll-target="#cleaning-data">Cleaning Data 🧹</a></li>
+  <li><a href="#plots-visualization" id="toc-plots-visualization" class="nav-link" data-scroll-target="#plots-visualization">Plots &amp; Visualization 📊</a></li>
+  <li><a href="#reference" id="toc-reference" class="nav-link" data-scroll-target="#reference">Reference 📖</a></li>
+  <li><a href="#submission" id="toc-submission" class="nav-link" data-scroll-target="#submission">Submission</a></li>
+  </ul></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+
+
+
+
+<section id="jane-street-market-eda" class="level1">
+<h1>Jane Street Market EDA 📈</h1>
+<blockquote class="blockquote">
+<p>Jane Street Market Prediction Kaggle Competition</p>
+</blockquote>
+<div id="cell-2" class="cell" data-execution_count="21">
+<div class="cell-output cell-output-display" data-execution_count="21">
+<div>
+<figure class="figure">
+<p><img src="2021-01-23-JaneStreet-Copy1_files/figure-html/cell-2-output-1.png" width="800" height="300" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<section id="project-definition" class="level3">
+<h3 class="anchored" data-anchor-id="project-definition">Project Definition 🏆</h3>
+<p>The project is based on Kaggle competition by Jane Street - <a href="https://www.kaggle.com/c/jane-street-market-prediction">Jane Street Market Prediction</a> <br> “Buy low, sell high” sounds easy. In reality, we know trading is difficult to solve and even more so in today’s fast financial markets. Developing strategy with machine learning model can help us maximize returns using market data from a major global stock exchange. Then the competition will take our predictiveness to model against future market returns and give feedback on the leaderboard. My goal is to explore financial area of data science and explore Kaggle community as much as possible. <br></p>
+<p>In general, if one is able to generate a highly predictive model which selects the right trades to execute, they would also be playing an important role in sending the market signals that push prices closer to “fair” values. That is, a better model will mean the market will be more efficient going forward. However, developing good models will be challenging for many reasons, including a very low signal-to-noise ratio, potential redundancy, strong feature correlation, and difficulty of coming up with a proper mathematical formulation. <br> (src: https://www.kaggle.com/c/jane-street-market-prediction/overview/description)</p>
+<section id="dataset-6gb-of-real-world-financial-markets." class="level4">
+<h4 class="anchored" data-anchor-id="dataset-6gb-of-real-world-financial-markets.">Dataset: 6GB of Real world financial markets.</h4>
+<ul>
+<li>anonymized set of features, feature_{0…129}, representing real stock market data. <br></li>
+<li>each row in the dataset represents a trading opportunity, for which you will be predicting an action value: 1 to make the trade and 0 to pass on it. <br></li>
+<li>each trade has an associated weight and resp, which together represents a return on the trade. <br></li>
+<li>date column is an integer which represents the day of the trade, while ts_id represents a time ordering. <br></li>
+<li>in addition to anonymized feature values, you are provided with metadata about the features in features.csv. <br></li>
+<li>more info: https://www.kaggle.com/c/jane-street-market-prediction/data</li>
+</ul>
+</section>
+<section id="problem-predict-action-columns" class="level4">
+<h4 class="anchored" data-anchor-id="problem-predict-action-columns">Problem: Predict ‘Action’ columns</h4>
+<p>Where 1 to make the trade and 0 to pass on it. The goal is minimize choosing bad trades and maximizing good trades. <br> #### Proposing a solution Even the world’s finest financial expert wouldn’t be able to gain anything from this anonymized data. Hence we are forced to use machine learning or data science approach to solve this problem. <br> Since the goal is clear (maximize profit) we want to see which features seem important or strange through EDA and visualizations. We will also have to grasp understanding of the data so it is not just a big 6GB of numbers. This will help us decide what to do with missing values and do feature engineering to help the computer learn. <br> Then we are going to build classifier model to let the computer do the hard work of learning to make good predictions. Of course, these models will be terrible at first so we will have to supervise it closely with some hyperparameters and strict evaluations. <br> Finally, the Jane Street will evaluate our submission and tell us if it is any good : ) #### Metrics The competition is evaluated on a utility score. Each row in the test set represents a trading opportunity for which you will be predicting an action value. Each trade j has an associated weight and resp, which represents a return. Weight and resp are not defined on test data set.</p>
+<p>For each date i, we define:</p>
+<p><span class="math inline">\(pi=∑_{j}(weight_{ij}∗resp_{ij}∗action{i_j})\)</span></p>
+<p><span class="math inline">\(t=\dfrac{∑p_i}{∑p_{i}^2}\sqrt{\dfrac{250}{|i|}}\)</span></p>
+<p>where |i| is the number of unique dates in the test set. The utility is then defined as: <span class="math inline">\(u=min(max(t,0),6)∑pi.\)</span></p>
+</section>
+</section>
+<section id="eda-and-visualization" class="level2">
+<h2 class="anchored" data-anchor-id="eda-and-visualization">EDA and Visualization</h2>
+<section id="import-data" class="level3">
+<h3 class="anchored" data-anchor-id="import-data">Import Data 📚</h3>
+<div id="cell-10" class="cell" data-execution_count="12">
+<div class="cell-output cell-output-stdout">
+<pre><code>df.shape: (2390491, 138)
+how many days? 500days</code></pre>
+</div>
+<div class="cell-output cell-output-display" data-execution_count="12">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">date</th>
+<th data-quarto-table-cell-role="th">weight</th>
+<th data-quarto-table-cell-role="th">resp_1</th>
+<th data-quarto-table-cell-role="th">resp_2</th>
+<th data-quarto-table-cell-role="th">resp_3</th>
+<th data-quarto-table-cell-role="th">resp_4</th>
+<th data-quarto-table-cell-role="th">resp</th>
+<th data-quarto-table-cell-role="th">feature_0</th>
+<th data-quarto-table-cell-role="th">feature_1</th>
+<th data-quarto-table-cell-role="th">feature_2</th>
+<th data-quarto-table-cell-role="th">...</th>
+<th data-quarto-table-cell-role="th">feature_121</th>
+<th data-quarto-table-cell-role="th">feature_122</th>
+<th data-quarto-table-cell-role="th">feature_123</th>
+<th data-quarto-table-cell-role="th">feature_124</th>
+<th data-quarto-table-cell-role="th">feature_125</th>
+<th data-quarto-table-cell-role="th">feature_126</th>
+<th data-quarto-table-cell-role="th">feature_127</th>
+<th data-quarto-table-cell-role="th">feature_128</th>
+<th data-quarto-table-cell-role="th">feature_129</th>
+<th data-quarto-table-cell-role="th">ts_id</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>0</td>
+<td>0.000000</td>
+<td>0.009916</td>
+<td>0.014079</td>
+<td>0.008773</td>
+<td>0.001390</td>
+<td>0.006270</td>
+<td>1</td>
+<td>-1.872746</td>
+<td>-2.191242</td>
+<td>...</td>
+<td>NaN</td>
+<td>1.168391</td>
+<td>8.313583</td>
+<td>1.782433</td>
+<td>14.018213</td>
+<td>2.653056</td>
+<td>12.600292</td>
+<td>2.301488</td>
+<td>11.445807</td>
+<td>0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>0</td>
+<td>16.673515</td>
+<td>-0.002828</td>
+<td>-0.003226</td>
+<td>-0.007319</td>
+<td>-0.011114</td>
+<td>-0.009792</td>
+<td>-1</td>
+<td>-1.349537</td>
+<td>-1.704709</td>
+<td>...</td>
+<td>NaN</td>
+<td>-1.178850</td>
+<td>1.777472</td>
+<td>-0.915458</td>
+<td>2.831612</td>
+<td>-1.417010</td>
+<td>2.297459</td>
+<td>-1.304614</td>
+<td>1.898684</td>
+<td>1</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>0</td>
+<td>0.000000</td>
+<td>0.025134</td>
+<td>0.027607</td>
+<td>0.033406</td>
+<td>0.034380</td>
+<td>0.023970</td>
+<td>-1</td>
+<td>0.812780</td>
+<td>-0.256156</td>
+<td>...</td>
+<td>NaN</td>
+<td>6.115747</td>
+<td>9.667908</td>
+<td>5.542871</td>
+<td>11.671595</td>
+<td>7.281757</td>
+<td>10.060014</td>
+<td>6.638248</td>
+<td>9.427299</td>
+<td>2</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>0</td>
+<td>0.000000</td>
+<td>-0.004730</td>
+<td>-0.003273</td>
+<td>-0.000461</td>
+<td>-0.000476</td>
+<td>-0.003200</td>
+<td>-1</td>
+<td>1.174378</td>
+<td>0.344640</td>
+<td>...</td>
+<td>NaN</td>
+<td>2.838853</td>
+<td>0.499251</td>
+<td>3.033732</td>
+<td>1.513488</td>
+<td>4.397532</td>
+<td>1.266037</td>
+<td>3.856384</td>
+<td>1.013469</td>
+<td>3</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>0</td>
+<td>0.138531</td>
+<td>0.001252</td>
+<td>0.002165</td>
+<td>-0.001215</td>
+<td>-0.006219</td>
+<td>-0.002604</td>
+<td>1</td>
+<td>-3.172026</td>
+<td>-3.093182</td>
+<td>...</td>
+<td>NaN</td>
+<td>0.344850</td>
+<td>4.101145</td>
+<td>0.614252</td>
+<td>6.623456</td>
+<td>0.800129</td>
+<td>5.233243</td>
+<td>0.362636</td>
+<td>3.926633</td>
+<td>4</td>
+</tr>
+</tbody>
+</table>
+
+<p>5 rows × 138 columns</p>
+</div>
+</div>
+</div>
+<div id="cell-11" class="cell" data-execution_count="13">
+<div class="cell-output cell-output-display" data-execution_count="13">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">date</th>
+<th data-quarto-table-cell-role="th">weight</th>
+<th data-quarto-table-cell-role="th">resp_1</th>
+<th data-quarto-table-cell-role="th">resp_2</th>
+<th data-quarto-table-cell-role="th">resp_3</th>
+<th data-quarto-table-cell-role="th">resp_4</th>
+<th data-quarto-table-cell-role="th">resp</th>
+<th data-quarto-table-cell-role="th">feature_0</th>
+<th data-quarto-table-cell-role="th">feature_1</th>
+<th data-quarto-table-cell-role="th">feature_2</th>
+<th data-quarto-table-cell-role="th">...</th>
+<th data-quarto-table-cell-role="th">feature_121</th>
+<th data-quarto-table-cell-role="th">feature_122</th>
+<th data-quarto-table-cell-role="th">feature_123</th>
+<th data-quarto-table-cell-role="th">feature_124</th>
+<th data-quarto-table-cell-role="th">feature_125</th>
+<th data-quarto-table-cell-role="th">feature_126</th>
+<th data-quarto-table-cell-role="th">feature_127</th>
+<th data-quarto-table-cell-role="th">feature_128</th>
+<th data-quarto-table-cell-role="th">feature_129</th>
+<th data-quarto-table-cell-role="th">ts_id</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">count</td>
+<td>2.390491e+06</td>
+<td>2.390491e+06</td>
+<td>2.390491e+06</td>
+<td>2.390491e+06</td>
+<td>2.390491e+06</td>
+<td>2.390491e+06</td>
+<td>2.390491e+06</td>
+<td>2.390491e+06</td>
+<td>2.390491e+06</td>
+<td>2.390491e+06</td>
+<td>...</td>
+<td>2.320637e+06</td>
+<td>2.390268e+06</td>
+<td>2.390268e+06</td>
+<td>2.374408e+06</td>
+<td>2.374408e+06</td>
+<td>2.381638e+06</td>
+<td>2.381638e+06</td>
+<td>2.388570e+06</td>
+<td>2.388570e+06</td>
+<td>2.390491e+06</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">mean</td>
+<td>2.478668e+02</td>
+<td>3.031535e+00</td>
+<td>1.434969e-04</td>
+<td>1.980749e-04</td>
+<td>2.824183e-04</td>
+<td>4.350201e-04</td>
+<td>4.083113e-04</td>
+<td>9.838565e-03</td>
+<td>3.855776e-01</td>
+<td>3.576875e-01</td>
+<td>...</td>
+<td>2.687757e-01</td>
+<td>3.435523e-01</td>
+<td>2.799973e-01</td>
+<td>3.351537e-01</td>
+<td>2.448752e-01</td>
+<td>3.391778e-01</td>
+<td>2.323809e-01</td>
+<td>3.425608e-01</td>
+<td>2.456182e-01</td>
+<td>1.195245e+06</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">std</td>
+<td>1.522746e+02</td>
+<td>7.672794e+00</td>
+<td>8.930163e-03</td>
+<td>1.230236e-02</td>
+<td>1.906882e-02</td>
+<td>3.291224e-02</td>
+<td>2.693609e-02</td>
+<td>9.999518e-01</td>
+<td>2.559373e+00</td>
+<td>2.477335e+00</td>
+<td>...</td>
+<td>2.174238e+00</td>
+<td>2.087842e+00</td>
+<td>1.977643e+00</td>
+<td>1.742587e+00</td>
+<td>2.242853e+00</td>
+<td>2.534498e+00</td>
+<td>1.795854e+00</td>
+<td>2.307130e+00</td>
+<td>1.765419e+00</td>
+<td>6.900755e+05</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">min</td>
+<td>0.000000e+00</td>
+<td>0.000000e+00</td>
+<td>-3.675043e-01</td>
+<td>-5.328334e-01</td>
+<td>-5.681196e-01</td>
+<td>-5.987447e-01</td>
+<td>-5.493845e-01</td>
+<td>-1.000000e+00</td>
+<td>-3.172026e+00</td>
+<td>-3.093182e+00</td>
+<td>...</td>
+<td>-7.471971e+00</td>
+<td>-5.862979e+00</td>
+<td>-6.029281e+00</td>
+<td>-4.080720e+00</td>
+<td>-8.136407e+00</td>
+<td>-8.215050e+00</td>
+<td>-5.765982e+00</td>
+<td>-7.024909e+00</td>
+<td>-5.282181e+00</td>
+<td>0.000000e+00</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">25%</td>
+<td>1.040000e+02</td>
+<td>1.617400e-01</td>
+<td>-1.859162e-03</td>
+<td>-2.655044e-03</td>
+<td>-5.030704e-03</td>
+<td>-9.310415e-03</td>
+<td>-7.157903e-03</td>
+<td>-1.000000e+00</td>
+<td>-1.299334e+00</td>
+<td>-1.263628e+00</td>
+<td>...</td>
+<td>-1.123252e+00</td>
+<td>-1.114326e+00</td>
+<td>-9.512009e-01</td>
+<td>-9.133750e-01</td>
+<td>-1.212124e+00</td>
+<td>-1.452912e+00</td>
+<td>-8.993050e-01</td>
+<td>-1.278341e+00</td>
+<td>-8.544535e-01</td>
+<td>5.976225e+05</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">50%</td>
+<td>2.540000e+02</td>
+<td>7.086770e-01</td>
+<td>4.552665e-05</td>
+<td>6.928179e-05</td>
+<td>1.164734e-04</td>
+<td>1.222579e-04</td>
+<td>8.634997e-05</td>
+<td>1.000000e+00</td>
+<td>-1.870182e-05</td>
+<td>-7.200577e-07</td>
+<td>...</td>
+<td>0.000000e+00</td>
+<td>7.006244e-17</td>
+<td>6.054629e-17</td>
+<td>4.870826e-17</td>
+<td>-2.558675e-16</td>
+<td>1.015055e-16</td>
+<td>5.419920e-17</td>
+<td>8.563069e-17</td>
+<td>4.869529e-17</td>
+<td>1.195245e+06</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">75%</td>
+<td>3.820000e+02</td>
+<td>2.471791e+00</td>
+<td>2.097469e-03</td>
+<td>2.939111e-03</td>
+<td>5.466336e-03</td>
+<td>9.804649e-03</td>
+<td>7.544347e-03</td>
+<td>1.000000e+00</td>
+<td>1.578417e+00</td>
+<td>1.526399e+00</td>
+<td>...</td>
+<td>1.342829e+00</td>
+<td>1.405926e+00</td>
+<td>1.308625e+00</td>
+<td>1.228277e+00</td>
+<td>1.409687e+00</td>
+<td>1.767275e+00</td>
+<td>1.111491e+00</td>
+<td>1.582633e+00</td>
+<td>1.125321e+00</td>
+<td>1.792868e+06</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">max</td>
+<td>4.990000e+02</td>
+<td>1.672937e+02</td>
+<td>2.453477e-01</td>
+<td>2.949339e-01</td>
+<td>3.265597e-01</td>
+<td>5.113795e-01</td>
+<td>4.484616e-01</td>
+<td>1.000000e+00</td>
+<td>7.442989e+01</td>
+<td>1.480763e+02</td>
+<td>...</td>
+<td>1.107771e+02</td>
+<td>4.812516e+01</td>
+<td>1.276908e+02</td>
+<td>6.514517e+01</td>
+<td>7.052807e+01</td>
+<td>5.872849e+01</td>
+<td>6.932221e+01</td>
+<td>5.119038e+01</td>
+<td>1.164568e+02</td>
+<td>2.390490e+06</td>
+</tr>
+</tbody>
+</table>
+
+<p>8 rows × 138 columns</p>
+</div>
+</div>
+</div>
+<div id="cell-12" class="cell" data-execution_count="14">
+<div class="cell-output cell-output-display" data-execution_count="14">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">feature</th>
+<th data-quarto-table-cell-role="th">tag_0</th>
+<th data-quarto-table-cell-role="th">tag_1</th>
+<th data-quarto-table-cell-role="th">tag_2</th>
+<th data-quarto-table-cell-role="th">tag_3</th>
+<th data-quarto-table-cell-role="th">tag_4</th>
+<th data-quarto-table-cell-role="th">tag_5</th>
+<th data-quarto-table-cell-role="th">tag_6</th>
+<th data-quarto-table-cell-role="th">tag_7</th>
+<th data-quarto-table-cell-role="th">tag_8</th>
+<th data-quarto-table-cell-role="th">...</th>
+<th data-quarto-table-cell-role="th">tag_19</th>
+<th data-quarto-table-cell-role="th">tag_20</th>
+<th data-quarto-table-cell-role="th">tag_21</th>
+<th data-quarto-table-cell-role="th">tag_22</th>
+<th data-quarto-table-cell-role="th">tag_23</th>
+<th data-quarto-table-cell-role="th">tag_24</th>
+<th data-quarto-table-cell-role="th">tag_25</th>
+<th data-quarto-table-cell-role="th">tag_26</th>
+<th data-quarto-table-cell-role="th">tag_27</th>
+<th data-quarto-table-cell-role="th">tag_28</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">count</td>
+<td>130</td>
+<td>130</td>
+<td>130</td>
+<td>130</td>
+<td>130</td>
+<td>130</td>
+<td>130</td>
+<td>130</td>
+<td>130</td>
+<td>130</td>
+<td>...</td>
+<td>130</td>
+<td>130</td>
+<td>130</td>
+<td>130</td>
+<td>130</td>
+<td>130</td>
+<td>130</td>
+<td>130</td>
+<td>130</td>
+<td>130</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">unique</td>
+<td>130</td>
+<td>2</td>
+<td>2</td>
+<td>2</td>
+<td>2</td>
+<td>2</td>
+<td>2</td>
+<td>2</td>
+<td>2</td>
+<td>2</td>
+<td>...</td>
+<td>2</td>
+<td>2</td>
+<td>2</td>
+<td>2</td>
+<td>2</td>
+<td>2</td>
+<td>2</td>
+<td>2</td>
+<td>2</td>
+<td>2</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">top</td>
+<td>feature_25</td>
+<td>False</td>
+<td>False</td>
+<td>False</td>
+<td>False</td>
+<td>False</td>
+<td>False</td>
+<td>False</td>
+<td>False</td>
+<td>False</td>
+<td>...</td>
+<td>False</td>
+<td>False</td>
+<td>False</td>
+<td>False</td>
+<td>False</td>
+<td>False</td>
+<td>False</td>
+<td>False</td>
+<td>False</td>
+<td>False</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">freq</td>
+<td>1</td>
+<td>113</td>
+<td>113</td>
+<td>113</td>
+<td>113</td>
+<td>113</td>
+<td>122</td>
+<td>90</td>
+<td>128</td>
+<td>128</td>
+<td>...</td>
+<td>123</td>
+<td>125</td>
+<td>125</td>
+<td>121</td>
+<td>82</td>
+<td>118</td>
+<td>118</td>
+<td>118</td>
+<td>118</td>
+<td>118</td>
+</tr>
+</tbody>
+</table>
+
+<p>4 rows × 30 columns</p>
+</div>
+</div>
+</div>
+<p>As told, all the featues and even tags are anonymized. There’s not much human interpretability just from describe tables. Except feature_0 is unique by being binary.</p>
+</section>
+<section id="cleaning-data" class="level3">
+<h3 class="anchored" data-anchor-id="cleaning-data">Cleaning Data 🧹</h3>
+<p>::: {#cell-15 .cell _kg_hide-input=‘true’ execution_count=9}</p>
+<div class="cell-output cell-output-stdout">
+<pre><code>There are 88 many cols with at least one null value
+{'feature_108', 'feature_91', 'feature_115', 'feature_128', 'feature_93', 'feature_33', 'feature_24', 'feature_4', 'feature_79', 'feature_28', 'feature_19', 'feature_88', 'feature_56', 'feature_117', 'feature_31', 'feature_21', 'feature_7', 'feature_94', 'feature_16', 'feature_76', 'feature_96', 'feature_12', 'feature_55', 'feature_29', 'feature_120', 'feature_35', 'feature_124', 'feature_32', 'feature_74', 'feature_17', 'feature_116', 'feature_97', 'feature_86', 'feature_105', 'feature_127', 'feature_36', 'feature_99', 'feature_34', 'feature_104', 'feature_10', 'feature_100', 'feature_58', 'feature_87', 'feature_111', 'feature_122', 'feature_80', 'feature_78', 'feature_25', 'feature_18', 'feature_59', 'feature_26', 'feature_73', 'feature_92', 'feature_15', 'feature_81', 'feature_27', 'feature_13', 'feature_112', 'feature_109', 'feature_125', 'feature_3', 'feature_98', 'feature_82', 'feature_84', 'feature_45', 'feature_90', 'feature_9', 'feature_8', 'feature_118', 'feature_75', 'feature_123', 'feature_22', 'feature_11', 'feature_23', 'feature_44', 'feature_20', 'feature_114', 'feature_106', 'feature_14', 'feature_102', 'feature_129', 'feature_110', 'feature_85', 'feature_126', 'feature_121', 'feature_30', 'feature_103', 'feature_72'}</code></pre>
+</div>
+<p>:::</p>
+<p>A lot of the histogram of above features has extreme outliers. For the full enlarged version of the histograms, check out <a href="https://www.kaggle.com/leetolo/jane-street-market-prediction-eda">here</a> It would be safe to fill the null values with medians. Other imputation method considered were mean and KNN-Imputation. Check out my other notebook where KNN-Imputation was used to train MLP.</p>
+<p>::: {#cell-17 .cell _kg_hide-input=‘true’ execution_count=21}</p>
+<div class="cell-output cell-output-stdout">
+<pre><code>feature with most nans: feature_27, with 395535</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="2021-01-23-JaneStreet-Copy1_files/figure-html/cell-10-output-2.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+<p>:::</p>
+<p>If we just remove all nans, we would be removing more than 16.54% of the dataset.</p>
+<p>Interesting points so far: - feature_0 is binary. - A lot of features seems to be normally distributed. - A lot of missing values.</p>
+</section>
+<section id="plots-visualization" class="level3">
+<h3 class="anchored" data-anchor-id="plots-visualization">Plots &amp; Visualization 📊</h3>
+<section id="resp-resp_1-resp_2-resp_3-resp_4" class="level4">
+<h4 class="anchored" data-anchor-id="resp-resp_1-resp_2-resp_3-resp_4">resp, resp_1, resp_2, resp_3, resp_4</h4>
+<p>::: {#cell-23 .cell _kg_hide-input=‘true’ execution_count=25}</p>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="2021-01-23-JaneStreet-Copy1_files/figure-html/cell-12-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+<p>:::</p>
+<p>We can see that resp is closely related to resp_4 (blue and purple). Resp_1 and resp_2 also seem to be closely related but much much linear. Resp_3 seem to be in the middle, where the shape is closer to upper group but position is slightly closer to green and orange.</p>
+</section>
+<section id="weights" class="level4">
+<h4 class="anchored" data-anchor-id="weights">Weights</h4>
+<p>Note: <strong>weight</strong> and <strong>resp</strong> multiplied together represents a return on the trade.</p>
+<p>::: {#cell-27 .cell _kg_hide-input=‘true’ execution_count=11}</p>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="2021-01-23-JaneStreet-Copy1_files/figure-html/cell-13-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+<p>:::</p>
+<p>We can see that most weights are around 0.2 and we can see two ‘peaks’ which is around 0.2 and 0.3. Note that maximum weight was 167.29 represented by 1.0 on x-axis. Thus 0.2 represents around 33.458 and 0.3 represents around 50.187.</p>
+<p>::: {#cell-29 .cell _kg_hide-input=‘true’ execution_count=9}</p>
+<div class="cell-output cell-output-display" data-execution_count="9">
+<pre><code>2921</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="2021-01-23-JaneStreet-Copy1_files/figure-html/cell-14-output-2.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+<p>:::</p>
+<p>Note that the graph plots all the positive gains. (Our 1’s for our action column). So we can see that there were ‘bigger’ gains in the beginning and as time approach 500, the gain becomes smaller. In conclusion, the earlier trades are much bigger but we don’t know what it’s going to be like in our competition test set.</p>
+<div id="cell-31" class="cell" data-execution_count="12">
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="2021-01-23-JaneStreet-Copy1_files/figure-html/cell-15-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>We know that we probability want to invest more ‘weight’ if there are bigger ‘resp’(return). We learn here that higher weights are only when resp is close to 0. In other words, it is dumb to trade if resp is away from 0 but it is safe to invest even a lot if it is near 0.</p>
+<p>::: {#cell-33 .cell _kg_hide-input=‘true’ execution_count=13}</p>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="2021-01-23-JaneStreet-Copy1_files/figure-html/cell-16-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-display" data-execution_count="13">
+<pre><code>74963</code></pre>
+</div>
+<p>:::</p>
+<p>In the Kaggle community, there’s been lots of discussion on how the trends changed significantly since day ~85. We can see much more trades happening before day 100. Rest of the days are still very active but not as noisy. We can suggest that there has been a change of trading model from Jane Street as discussed <a href="https://www.kaggle.com/c/jane-street-market-prediction/discussion/201930">here</a> by <a href="https://www.kaggle.com/carlmcbrideellis">Carl</a>.</p>
+<p>Let us look at the most important feature, ‘feature_0’</p>
+<div id="cell-36" class="cell" data-execution_count="14">
+<div class="cell-output cell-output-display" data-execution_count="14">
+<pre><code> 1    1207005
+-1    1183486
+Name: feature_0, dtype: int64</code></pre>
+</div>
+</div>
+<p>::: {#cell-37 .cell _kg_hide-input=‘true’ execution_count=15}</p>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="2021-01-23-JaneStreet-Copy1_files/figure-html/cell-18-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+<p>:::</p>
+<p>Interestingly, when feature_0 is 1, plot shows negative slope while in contrast, when feature_0 is -1, plot shows positive slope. My guess is that feature_0 corresponds to Buy(1) and Sell(-1) or vice versa. So if we set action to 1 with feature_0 = 1 then we are selling and when we set action to 0 with feature_0 = -1, then we are buying. This makes sense since whether we are buying or selling we can still lose or gain profit.</p>
+</section>
+<section id="features" class="level4">
+<h4 class="anchored" data-anchor-id="features">Features</h4>
+<p>Remember that we have another file called features.csv. Which can help us understand 100+ features and maybe cluster into groups. Let’s take a look. <br></p>
+<div id="cell-41" class="cell" data-execution_count="20">
+<div class="cell-output cell-output-display" data-execution_count="20">
+<div>
+<figure class="figure">
+<p><img src="2021-01-23-JaneStreet-Copy1_files/figure-html/cell-19-output-1.png" width="800" height="600" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Let us see what tag_0 groups tells us.</p>
+<div id="cell-44" class="cell" data-execution_count="17">
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="2021-01-23-JaneStreet-Copy1_files/figure-html/cell-21-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Correlation between features of tag_0. It looks like there certainly are correlation between elements of the group except a few.</p>
+<p>Interesting points: - feature_0 has no tags - feature 79 to 119 all has 4 tags - feature 7 to 36 have 3 and 4 tags periodically - Similar trend between 2 to 7, 37 to 40, 120 to 129 - tag_n doesn’t tell too much about the features</p>
+</section>
+</section>
+<section id="reference" class="level3">
+<h3 class="anchored" data-anchor-id="reference">Reference 📖</h3>
+<ul>
+<li><a href="https://www.kaggle.com/carlmcbrideellis/jane-street-eda-of-day-0-and-feature-importance">Jane Street: EDA of day 0 and feature importance</a></li>
+<li><a href="https://www.kaggle.com/muhammadmelsherbini/jane-street-extensive-eda-pca-starter">Jane_street_Extensive_EDA &amp; PCA starter 📊⚡</a></li>
+<li><a href="https://www.kaggle.com/hamzashabbirbhatti/eda-a-quant-s-prespective#Weight">EDA / A Quant’s Prespective</a></li>
+</ul>
+</section>
+<section id="submission" class="level3">
+<h3 class="anchored" data-anchor-id="submission">Submission</h3>
+<p>In another <a href="https://leejaeka.github.io/jaekangai/mlp/python/feature%20engineering/imputation/jane%20street/kaggle/visualization/big%20data/random%20forest/2021/01/25/jane-predict.html">notebook</a>. ### Implementation Planning Thoughts going into predicting phase. 1. Days before ~100 can be dropped as suspicion of model shift. 2. Feature_0 seem very important to find slope of cummulative resp. 3. Resp near 0 is prefered over other values. 4. A lot of features are normally distributed. 5. We have over 2 million datas, it would be safe to add lot more features(feature enginerring) 6. There are a lot of missing values too. Can try mean, median or KNN imputation methods. 7. Note that although this is kind of a time series data, we can only predict with features 0 to 129</p>
+
+
+</section>
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const disableStylesheet = (stylesheets) => {
+    for (let i=0; i < stylesheets.length; i++) {
+      const stylesheet = stylesheets[i];
+      stylesheet.rel = 'prefetch';
+    }
+  }
+  const enableStylesheet = (stylesheets) => {
+    for (let i=0; i < stylesheets.length; i++) {
+      const stylesheet = stylesheets[i];
+      stylesheet.rel = 'stylesheet';
+    }
+  }
+  const manageTransitions = (selector, allowTransitions) => {
+    const els = window.document.querySelectorAll(selector);
+    for (let i=0; i < els.length; i++) {
+      const el = els[i];
+      if (allowTransitions) {
+        el.classList.remove('notransition');
+      } else {
+        el.classList.add('notransition');
+      }
+    }
+  }
+  const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+    const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+    const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+    let newTheme = '';
+    if(darkModeDefault) {
+      newTheme = isAlternate ? baseTheme : alternateTheme;
+    } else {
+      newTheme = isAlternate ? alternateTheme : baseTheme;
+    }
+    const changeGiscusTheme = () => {
+      // From: https://github.com/giscus/giscus/issues/336
+      const sendMessage = (message) => {
+        const iframe = document.querySelector('iframe.giscus-frame');
+        if (!iframe) return;
+        iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+      }
+      sendMessage({
+        setConfig: {
+          theme: newTheme
+        }
+      });
+    }
+    const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+    if (isGiscussLoaded) {
+      changeGiscusTheme();
+    }
+  }
+  const toggleColorMode = (alternate) => {
+    // Switch the stylesheets
+    const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+    manageTransitions('#quarto-margin-sidebar .nav-link', false);
+    if (alternate) {
+      enableStylesheet(alternateStylesheets);
+      for (const sheetNode of alternateStylesheets) {
+        if (sheetNode.id === "quarto-bootstrap") {
+          toggleBodyColorMode(sheetNode);
+        }
+      }
+    } else {
+      disableStylesheet(alternateStylesheets);
+      toggleBodyColorPrimary();
+    }
+    manageTransitions('#quarto-margin-sidebar .nav-link', true);
+    // Switch the toggles
+    const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+    for (let i=0; i < toggles.length; i++) {
+      const toggle = toggles[i];
+      if (toggle) {
+        if (alternate) {
+          toggle.classList.add("alternate");     
+        } else {
+          toggle.classList.remove("alternate");
+        }
+      }
+    }
+    // Hack to workaround the fact that safari doesn't
+    // properly recolor the scrollbar when toggling (#1455)
+    if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+      manageTransitions("body", false);
+      window.scrollTo(0, 1);
+      setTimeout(() => {
+        window.scrollTo(0, 0);
+        manageTransitions("body", true);
+      }, 40);  
+    }
+  }
+  const isFileUrl = () => { 
+    return window.location.protocol === 'file:';
+  }
+  const hasAlternateSentinel = () => {  
+    let styleSentinel = getColorSchemeSentinel();
+    if (styleSentinel !== null) {
+      return styleSentinel === "alternate";
+    } else {
+      return false;
+    }
+  }
+  const setStyleSentinel = (alternate) => {
+    const value = alternate ? "alternate" : "default";
+    if (!isFileUrl()) {
+      window.localStorage.setItem("quarto-color-scheme", value);
+    } else {
+      localAlternateSentinel = value;
+    }
+  }
+  const getColorSchemeSentinel = () => {
+    if (!isFileUrl()) {
+      const storageValue = window.localStorage.getItem("quarto-color-scheme");
+      return storageValue != null ? storageValue : localAlternateSentinel;
+    } else {
+      return localAlternateSentinel;
+    }
+  }
+  const darkModeDefault = true;
+  let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+  // Dark / light mode switch
+  window.quartoToggleColorScheme = () => {
+    // Read the current dark / light value 
+    let toAlternate = !hasAlternateSentinel();
+    toggleColorMode(toAlternate);
+    setStyleSentinel(toAlternate);
+    toggleGiscusIfUsed(toAlternate, darkModeDefault);
+  };
+  // Ensure there is a toggle, if there isn't float one in the top right
+  if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+    const a = window.document.createElement('a');
+    a.classList.add('top-right');
+    a.classList.add('quarto-color-scheme-toggle');
+    a.href = "";
+    a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+    const i = window.document.createElement("i");
+    i.classList.add('bi');
+    a.appendChild(i);
+    window.document.body.appendChild(a);
+  }
+  // Switch to dark mode if need be
+  if (hasAlternateSentinel()) {
+    toggleColorMode(true);
+  } else {
+    toggleColorMode(false);
+  }
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    // For code content inside modals, clipBoardJS needs to be initialized with a container option
+    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
